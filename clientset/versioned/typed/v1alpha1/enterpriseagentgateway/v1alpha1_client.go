@@ -21,7 +21,7 @@ import (
 	http "net/http"
 
 	v1alpha1enterpriseagentgateway "github.com/solo-io/gloo-gateway/v2/api/v1alpha1/enterpriseagentgateway"
-	scheme "github.com/solo-io/gloo-gateway/v2/internal/client/clientset/versioned/scheme"
+	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 

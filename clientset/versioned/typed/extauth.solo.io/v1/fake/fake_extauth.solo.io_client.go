@@ -18,7 +18,7 @@ limitations under the License.
 package fake
 
 import (
-	v1 "github.com/solo-io/gloo-gateway/v2/internal/client/clientset/versioned/typed/extauth.solo.io/v1"
+	v1 "github.com/solo-io/kgateway-client/clientset/versioned/typed/extauth.solo.io/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )

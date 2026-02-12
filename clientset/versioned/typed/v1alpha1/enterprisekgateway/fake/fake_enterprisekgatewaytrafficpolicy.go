@@ -19,7 +19,7 @@ package fake
 
 import (
 	enterprisekgateway "github.com/solo-io/gloo-gateway/v2/api/v1alpha1/enterprisekgateway"
-	v1alpha1enterprisekgateway "github.com/solo-io/gloo-gateway/v2/internal/client/clientset/versioned/typed/v1alpha1/enterprisekgateway"
+	v1alpha1enterprisekgateway "github.com/solo-io/kgateway-client/clientset/versioned/typed/v1alpha1/enterprisekgateway"
 	gentype "k8s.io/client-go/gentype"
 )
 

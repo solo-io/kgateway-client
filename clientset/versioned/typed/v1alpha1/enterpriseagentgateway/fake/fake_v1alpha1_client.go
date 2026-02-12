@@ -18,7 +18,7 @@ limitations under the License.
 package fake
 
 import (
-	enterpriseagentgateway "github.com/solo-io/gloo-gateway/v2/internal/client/clientset/versioned/typed/v1alpha1/enterpriseagentgateway"
+	enterpriseagentgateway "github.com/solo-io/kgateway-client/clientset/versioned/typed/v1alpha1/enterpriseagentgateway"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
