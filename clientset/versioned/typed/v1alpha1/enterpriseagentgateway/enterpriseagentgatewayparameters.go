@@ -21,7 +21,7 @@ import (
 	context "context"
 
 	v1alpha1enterpriseagentgateway "github.com/solo-io/gloo-gateway/v2/api/v1alpha1/enterpriseagentgateway"
-	scheme "github.com/solo-io/gloo-gateway/v2/internal/client/clientset/versioned/scheme"
+	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
