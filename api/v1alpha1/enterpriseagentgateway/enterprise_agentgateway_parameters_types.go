@@ -2,7 +2,6 @@ package enterpriseagentgateway
 
 import (
 	upstreamagent "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/agentgateway"
-	"github.com/kgateway-dev/kgateway/v2/api/v1alpha1/shared"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -89,36 +88,29 @@ type ExtensionDeployment struct {
 	// Use this for advanced customization not covered by the typed config fields,
 	// such as adding initContainers, sidecars, or removing security contexts for OpenShift.
 	// +optional
-	Deployment *shared.KubernetesResourceOverlay `json:"deployment,omitempty"`
+	Deployment *upstreamagent.KubernetesResourceOverlay `json:"deployment,omitempty"`
 
 	// Service allows specifying overrides for the generated Service resource.
 	// +optional
-	Service *shared.KubernetesResourceOverlay `json:"service,omitempty"`
+	Service *upstreamagent.KubernetesResourceOverlay `json:"service,omitempty"`
 
 	// ServiceAccount allows specifying overrides for the generated ServiceAccount resource.
 	// +optional
-	ServiceAccount *shared.KubernetesResourceOverlay `json:"serviceAccount,omitempty"`
+	ServiceAccount *upstreamagent.KubernetesResourceOverlay `json:"serviceAccount,omitempty"`
 
 	// PodDisruptionBudget allows creating a PodDisruptionBudget for this extension.
 	// If absent, no PDB is created. If present, a PDB is created with its selector
 	// automatically configured to target the extension Deployment.
 	// The metadata and spec fields from this overlay are applied to the generated PDB.
 	// +optional
-	PodDisruptionBudget *shared.KubernetesResourceOverlay `json:"podDisruptionBudget,omitempty"`
+	PodDisruptionBudget *upstreamagent.KubernetesResourceOverlay `json:"podDisruptionBudget,omitempty"`
 
 	// HorizontalPodAutoscaler allows creating a HorizontalPodAutoscaler for this extension.
 	// If absent, no HPA is created. If present, an HPA is created with its scaleTargetRef
 	// automatically configured to target the extension Deployment.
 	// The metadata and spec fields from this overlay are applied to the generated HPA.
 	// +optional
-	HorizontalPodAutoscaler *shared.KubernetesResourceOverlay `json:"horizontalPodAutoscaler,omitempty"`
-
-	// VerticalPodAutoscaler allows creating a VerticalPodAutoscaler for this extension.
-	// If absent, no VPA is created. If present, a VPA is created with its targetRef
-	// automatically configured to target the extension Deployment.
-	// The metadata and spec fields from this overlay are applied to the generated VPA.
-	// +optional
-	VerticalPodAutoscaler *shared.KubernetesResourceOverlay `json:"verticalPodAutoscaler,omitempty"`
+	HorizontalPodAutoscaler *upstreamagent.KubernetesResourceOverlay `json:"horizontalPodAutoscaler,omitempty"`
 }
 
 // CA is the certificate authority configuration for Istio integration.

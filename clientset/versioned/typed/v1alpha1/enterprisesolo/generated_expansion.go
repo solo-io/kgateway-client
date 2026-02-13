@@ -18,5 +18,3 @@ limitations under the License.
 package enterprisesolo
 
 type EnterpriseListenerSetExpansion interface{}
-
-type WAFPolicyExpansion interface{}

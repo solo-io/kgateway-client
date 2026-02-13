@@ -28,7 +28,6 @@ import (
 type EnterprisekgatewayEnterprisesoloInterface interface {
 	RESTClient() rest.Interface
 	EnterpriseListenerSetsGetter
-	WAFPoliciesGetter
 }
 
 // EnterprisekgatewayEnterprisesoloClient is used to interact with features provided by the enterprise.solo.io group.
@@ -38,10 +37,6 @@ type EnterprisekgatewayEnterprisesoloClient struct {
 
 func (c *EnterprisekgatewayEnterprisesoloClient) EnterpriseListenerSets(namespace string) EnterpriseListenerSetInterface {
 	return newEnterpriseListenerSets(c, namespace)
-}
-
-func (c *EnterprisekgatewayEnterprisesoloClient) WAFPolicies(namespace string) WAFPolicyInterface {
-	return newWAFPolicies(c, namespace)
 }
 
 // NewForConfig creates a new EnterprisekgatewayEnterprisesoloClient for the given config.
