@@ -20,7 +20,7 @@ package v1
 import (
 	context "context"
 
-	extauthsoloiov1 "github.com/solo-io/gloo-gateway/v2/external/extauth.solo.io/v1"
+	extauthsoloiov1 "github.com/solo-io/kgateway-client/external/extauth.solo.io/v1"
 	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"

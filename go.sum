@@ -90,8 +90,6 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
-github.com/solo-io/gloo-gateway/v2 v2.0.0-20260211211509-fb3f8991b09a h1:92A+9y9dQLxlllXDyaTanJkvSiap7fAYNu1+1fISNkA=
-github.com/solo-io/gloo-gateway/v2 v2.0.0-20260211211509-fb3f8991b09a/go.mod h1:JwRO+Q99miwYIy+m6HSDbTdeq6vuoJXRhOKdzina+8o=
 github.com/solo-io/protoc-gen-ext v0.1.0 h1:WvmXaontRCax9Wq5vAdewv+4tCwTrubC5rbk6coSajQ=
 github.com/solo-io/protoc-gen-ext v0.1.0/go.mod h1:pJ8/XXyHs6T3p7dpu9Hmv0B4uhn7HI+OR2YIjT1mKDc=
 github.com/spf13/pflag v1.0.10 h1:4EBh2KAYBwaONj6b2Ye1GiHfwjqyROoF4RwYO+vPwFk=

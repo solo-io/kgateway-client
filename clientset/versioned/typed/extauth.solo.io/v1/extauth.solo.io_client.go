@@ -20,7 +20,7 @@ package v1
 import (
 	http "net/http"
 
-	extauthsoloiov1 "github.com/solo-io/gloo-gateway/v2/external/extauth.solo.io/v1"
+	extauthsoloiov1 "github.com/solo-io/kgateway-client/external/extauth.solo.io/v1"
 	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )

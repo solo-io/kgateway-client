@@ -20,7 +20,7 @@ package v1alpha1
 import (
 	http "net/http"
 
-	ratelimitsoloiov1alpha1 "github.com/solo-io/gloo-gateway/v2/external/ratelimit.solo.io/v1alpha1"
+	ratelimitsoloiov1alpha1 "github.com/solo-io/kgateway-client/external/ratelimit.solo.io/v1alpha1"
 	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )

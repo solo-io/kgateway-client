@@ -20,7 +20,7 @@ package enterprisesolo
 import (
 	context "context"
 
-	v1alpha1enterprisesolo "github.com/solo-io/gloo-gateway/v2/api/v1alpha1/enterprisesolo"
+	v1alpha1enterprisesolo "github.com/solo-io/kgateway-client/api/v1alpha1/enterprisesolo"
 	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
