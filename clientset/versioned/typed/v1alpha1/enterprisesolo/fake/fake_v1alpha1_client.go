@@ -31,6 +31,10 @@ func (c *FakeEnterprisekgatewayEnterprisesolo) EnterpriseListenerSets(namespace 
 	return newFakeEnterpriseListenerSets(c, namespace)
 }
 
+func (c *FakeEnterprisekgatewayEnterprisesolo) WAFPolicies(namespace string) enterprisesolo.WAFPolicyInterface {
+	return newFakeWAFPolicies(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeEnterprisekgatewayEnterprisesolo) RESTClient() rest.Interface {

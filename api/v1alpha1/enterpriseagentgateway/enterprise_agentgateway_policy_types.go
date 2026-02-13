@@ -114,6 +114,22 @@ type TokenExchangeCfg struct {
 	// +optional
 	// +kubebuilder:validation:Enum=ElicitationOnly;ExchangeOnly
 	Mode *TokenExchangeMode `json:"mode,omitempty"`
+
+	// Oidc configures which OAuth/OIDC client Secret should be used for elicitations and token storage
+	// associated with this backend.
+	// The token exchange server keys provider selection by the "resource" value used in elicitation APIs.
+	// When this policy targets an AgentgatewayBackend, the backend name (and also "namespace/name") is
+	// used as the resource key for mapping to this SecretName.
+	// +optional
+	Oidc *TokenExchangeOidcConfig `json:"oidc,omitempty"`
+}
+
+type TokenExchangeOidcConfig struct {
+	// SecretName is the name of the Kubernetes Secret in the agentgateway installation namespace
+	// containing the OAuth client configuration (authorize_url, access_token_url, client_id, etc.).
+	// This field is required unless Mode is set to ExchangeOnly.
+	// +required
+	SecretName string `json:"secretName"`
 }
 
 // EnterpriseAgentgatewayPolicyTraffic defines the desired state of EnterpriseAgentgatewayPolicyTraffic
