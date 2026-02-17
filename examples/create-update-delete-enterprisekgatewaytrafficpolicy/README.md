@@ -41,7 +41,9 @@ Run the application with your kubeconfig:
 The application runs these operations in order:
 
 1. Create an `EnterpriseKgatewayTrafficPolicy` named `demo-enterprisekgateway-traffic-policy`.
-2. Update it by adding the label `examples.solo.io/updated=true` using `RetryOnConflict`.
+2. Update it using `RetryOnConflict` by:
+   - adding label `examples.solo.io/updated=true`
+   - changing `spec.targetRefs[0].name` from `example-gateway` to `example-gateway-updated`
 3. List `EnterpriseKgatewayTrafficPolicy` objects in the namespace.
 4. Delete `demo-enterprisekgateway-traffic-policy`.
 
@@ -55,11 +57,11 @@ Created EnterpriseKgatewayTrafficPolicy "demo-enterprisekgateway-traffic-policy"
 -> Press Return key to continue.
 
 Updating EnterpriseKgatewayTrafficPolicy...
-Updated EnterpriseKgatewayTrafficPolicy...
+Updated EnterpriseKgatewayTrafficPolicy (label examples.solo.io/updated="true", first targetRef.name="example-gateway-updated", generation=2).
 -> Press Return key to continue.
 
 Listing EnterpriseKgatewayTrafficPolicies in namespace "default":
- * demo-enterprisekgateway-traffic-policy (entExtAuth.disable=true)
+ * demo-enterprisekgateway-traffic-policy (targetRef.name=example-gateway-updated, examples.solo.io/updated="true", entExtAuth.disable=true)
 -> Press Return key to continue.
 
 Deleting EnterpriseKgatewayTrafficPolicy...

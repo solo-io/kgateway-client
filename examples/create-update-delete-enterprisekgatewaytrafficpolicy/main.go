@@ -36,8 +36,13 @@ import (
 )
 
 const (
-	defaultNamespace = "default"
-	resourceName     = "demo-enterprisekgateway-traffic-policy"
+	defaultNamespace        = "default"
+	resourceName            = "demo-enterprisekgateway-traffic-policy"
+	initialGatewayName      = "example-gateway"
+	updatedGatewayName      = "example-gateway-updated"
+	updatedLabelKey         = "examples.solo.io/updated"
+	updatedLabelValue       = "true"
+	missingTargetRefMessage = "<none>"
 )
 
 func main() {
@@ -82,7 +87,10 @@ func main() {
 		if latest.Labels == nil {
 			latest.Labels = map[string]string{}
 		}
-		latest.Labels["examples.solo.io/updated"] = "true"
+		latest.Labels[updatedLabelKey] = updatedLabelValue
+		if len(latest.Spec.TargetRefs) > 0 {
+			latest.Spec.TargetRefs[0].Name = gwv1.ObjectName(updatedGatewayName)
+		}
 
 		_, updateErr := trafficPoliciesClient.Update(context.TODO(), latest, metav1.UpdateOptions{})
 		return updateErr
@@ -90,7 +98,17 @@ func main() {
 	if retryErr != nil {
 		panic(fmt.Errorf("update failed: %w", retryErr))
 	}
-	fmt.Println("Updated EnterpriseKgatewayTrafficPolicy...")
+	updated, err := trafficPoliciesClient.Get(context.TODO(), resourceName, metav1.GetOptions{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf(
+		"Updated EnterpriseKgatewayTrafficPolicy (label %s=%q, first targetRef.name=%q, generation=%d).\n",
+		updatedLabelKey,
+		updated.Labels[updatedLabelKey],
+		firstTargetRefName(updated),
+		updated.Generation,
+	)
 
 	prompt()
 	fmt.Printf("Listing EnterpriseKgatewayTrafficPolicies in namespace %q:\n", namespace)
@@ -99,7 +117,14 @@ func main() {
 		panic(err)
 	}
 	for _, policy := range list.Items {
-		fmt.Printf(" * %s (entExtAuth.disable=%t)\n", policy.Name, isEntExtAuthDisabled(&policy))
+		fmt.Printf(
+			" * %s (targetRef.name=%s, %s=%q, entExtAuth.disable=%t)\n",
+			policy.Name,
+			firstTargetRefName(&policy),
+			updatedLabelKey,
+			policy.Labels[updatedLabelKey],
+			isEntExtAuthDisabled(&policy),
+		)
 	}
 
 	prompt()
@@ -130,7 +155,7 @@ func newDemoEnterpriseKgatewayTrafficPolicy(namespace string) *enterprisekgatewa
 						LocalPolicyTargetReference: upstreamshared.LocalPolicyTargetReference{
 							Group: gwv1.Group("gateway.networking.k8s.io"),
 							Kind:  gwv1.Kind("Gateway"),
-							Name:  gwv1.ObjectName("example-gateway"),
+							Name:  gwv1.ObjectName(initialGatewayName),
 						},
 					},
 				},
@@ -144,6 +169,13 @@ func newDemoEnterpriseKgatewayTrafficPolicy(namespace string) *enterprisekgatewa
 
 func isEntExtAuthDisabled(policy *enterprisekgatewayv1alpha1.EnterpriseKgatewayTrafficPolicy) bool {
 	return policy.Spec.EntExtAuth != nil && policy.Spec.EntExtAuth.Disable != nil
+}
+
+func firstTargetRefName(policy *enterprisekgatewayv1alpha1.EnterpriseKgatewayTrafficPolicy) string {
+	if len(policy.Spec.TargetRefs) == 0 {
+		return missingTargetRefMessage
+	}
+	return string(policy.Spec.TargetRefs[0].Name)
 }
 
 func prompt() {

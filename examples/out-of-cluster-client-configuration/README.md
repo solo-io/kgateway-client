@@ -39,8 +39,16 @@ Optionally provide a specific kubeconfig file and namespace:
 Expected output (repeats every 10 seconds):
 
 ```text
+Created EnterpriseKgatewayTrafficPolicy "example-enterprisekgateway-traffic-policy" in namespace "default"
 There are 1 EnterpriseKgatewayTrafficPolicies in namespace "default"
-EnterpriseKgatewayTrafficPolicy "example-enterprisekgateway-traffic-policy" in namespace "default" not found
+Found EnterpriseKgatewayTrafficPolicy "example-enterprisekgateway-traffic-policy" in namespace "default"
 ```
 
 Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to stop.
+
+## Cleanup
+
+```sh
+kubectl delete enterprisekgatewaytrafficpolicies.enterprisekgateway.solo.io \
+  example-enterprisekgateway-traffic-policy -n default --ignore-not-found
+```
