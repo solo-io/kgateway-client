@@ -1,0 +1,3 @@
+# Local build outputs from example commands like: go build -o app
+**/app
+!**/app/
