@@ -56,7 +56,7 @@ type RBACJWTPrincipal struct {
 
 	// The matcher to use when evaluating this principal. If omitted, exact string comparison (ExactString) is used.
 	// +optional
-	// +kubebuilder:validation:Enum=ExactString;Boolean;ListContains
+	// +kubebuilder:validation:Enum=ExactString;Boolean;ListContains;SpaceDelimitedStringContains
 	Matcher *RBACJWTPrincipalClaimMatcher `json:"matcher,omitempty"`
 }
 
@@ -69,6 +69,9 @@ const (
 	JwtPrincipalClaimMatcherBoolean RBACJWTPrincipalClaimMatcher = "Boolean"
 	// The JWT claim value is a list that contains a string that exactly matches the value.
 	JwtPrincipalClaimMatcherListContains RBACJWTPrincipalClaimMatcher = "ListContains"
+	// The JWT claim value is a space-delimited string that contains one or more tokens.
+	// Multiple tokens are matched with AND logic (all must be present).
+	JwtPrincipalClaimMatcherSpaceDelimitedStringContains RBACJWTPrincipalClaimMatcher = "SpaceDelimitedStringContains"
 )
 
 // What permissions should be granted. An empty field means allow-all.
