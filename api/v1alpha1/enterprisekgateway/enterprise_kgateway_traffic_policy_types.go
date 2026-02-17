@@ -62,6 +62,10 @@ type EnterpriseKgatewayTrafficPolicySpec struct {
 	// EntRBAC provides config for RBAC rules based on JWT claims resulting from authentication with `entJWT` configs
 	// +optional
 	EntRBAC *EntRBAC `json:"entRBAC,omitempty"`
+
+	// EntWAF defines the Web Application Firewall configuration
+	// +optional
+	EntWAF *EntWAF `json:"entWAF,omitempty"`
 }
 
 type EntRateLimit struct {
@@ -113,6 +117,26 @@ type EntExtAuth struct {
 
 	// Disable all external authorization filters.
 	// Can be used to disable external authorization policies applied at a higher level in the config hierarchy.
+	// +optional
+	Disable *upstreamshared.PolicyDisable `json:"disable,omitempty"`
+}
+
+// +kubebuilder:validation:ExactlyOneOf=wafPolicyRef;disable
+// +kubebuilder:validation:AtMostOneOf=wafServer;disable
+type EntWAF struct {
+	// WAFPolicyRef references the WAFPolicy we want to use for the traffic policy
+	// +optional
+	WAFPolicyRef *shared.WAFPolicyRef `json:"wafPolicyRef,omitempty"`
+
+	// WAFServer is a reference to the external processing gRPC service that will be used to process requests
+	// when WAF is enabled.
+	// If not set, defaults to the extproc service named 'waf-extproc' in the same namespace as
+	// the Solo Enterprise for kgateway control plane.
+	// +optional
+	WAFServer *gwv1.BackendObjectReference `json:"wafServer,omitempty"`
+
+	// Disable WAF.
+	// Can be used to disable WAF policies applied at a higher level in the config hierarchy.
 	// +optional
 	Disable *upstreamshared.PolicyDisable `json:"disable,omitempty"`
 }

@@ -35,8 +35,8 @@ type WAFPolicy struct {
 // WAFPolicySpec contains Web Application Firewall configuration.
 type WAFPolicySpec struct {
 	// CoreRuleSet contains settings for the OWASP CoreRuleSet.
-	// If set, then the OWASP CRS rules will be loaded.
-	// The bundled WAF extproc server uses the [v4 CRS rules](https://github.com/coreruleset/coreruleset/tree/v4.0/main/rules).
+	// If set, then the OWASP CoreRuleSet rules will be loaded.
+	// The bundled WAF extproc server uses the [v4 CoreRuleSet rules](https://github.com/coreruleset/coreruleset/tree/v4.0/main/rules).
 	// +optional
 	CoreRuleSet *CoreRuleSet `json:"coreRuleSet,omitempty"`
 
@@ -46,6 +46,8 @@ type WAFPolicySpec struct {
 	RuleEngineSettings DirectiveSource `json:"ruleEngineSettings"`
 
 	// CustomDirectives is a list of custom directives to apply.
+	// Custom directives will be applied after the CoreRuleSet rules and settings (if enabled) and WAF rule engine settings,
+	// and can be used to modify/exclude CoreRuleSet rules or add custom rules, for example.
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	// +optional
@@ -84,10 +86,10 @@ type DirectiveSource struct {
 
 // CoreRuleSet specifies custom settings for the OWASP CoreRuleSet.
 type CoreRuleSet struct {
-	// CRSSettings are settings that apply to the CoreRuleSet.
-	// For an example Coraza-compatible CRS settings file, see: https://github.com/corazawaf/coraza-coreruleset/blob/v4.23.0/rules/%40crs-setup.conf.example
+	// Settings are settings that apply to the CoreRuleSet.
+	// For an example Coraza-compatible CoreRuleSet settings file, see: https://github.com/corazawaf/coraza-coreruleset/blob/v4.23.0/rules/%40crs-setup.conf.example
 	// +required
-	CRSSettings DirectiveSource `json:"crsSettings"`
+	Settings DirectiveSource `json:"settings"`
 }
 
 // +k8s:openapi-gen=true

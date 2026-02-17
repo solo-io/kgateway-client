@@ -11,7 +11,7 @@ type RateLimitConfigRef struct {
 	Name gwv1.ObjectName `json:"name"`
 
 	// Namespace is the namespace of the RateLimitConfig resource.
-	// If not set, defaults to the namespace of the EnterpriseKgatewayTrafficPolicy.
+	// If not set, defaults to the namespace of the policy from which the RateLimitConfig is referenced.
 	// +optional
 	Namespace *gwv1.Namespace `json:"namespace,omitempty"`
 }
@@ -23,7 +23,19 @@ type AuthConfigRef struct {
 	Name gwv1.ObjectName `json:"name"`
 
 	// Namespace is the namespace of the AuthConfig resource.
-	// If not set, defaults to the namespace of the EnterpriseKgatewayTrafficPolicy.
+	// If not set, defaults to the namespace of the policy from which the AuthConfig is referenced.
+	// +optional
+	Namespace *gwv1.Namespace `json:"namespace,omitempty"`
+}
+
+// WAFPolicyRef selects the WAFPolicy resource with the configuration that you want to use.
+type WAFPolicyRef struct {
+	// Name is the name of the WAFPolicy resource.
+	// +required
+	Name gwv1.ObjectName `json:"name"`
+
+	// Namespace is the namespace of the WAFPolicy resource.
+	// If not set, defaults to the namespace of the policy from which the WAFPolicy is referenced.
 	// +optional
 	Namespace *gwv1.Namespace `json:"namespace,omitempty"`
 }
