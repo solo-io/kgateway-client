@@ -20,8 +20,8 @@ package enterpriseagentgateway
 import (
 	http "net/http"
 
-	v1alpha1enterpriseagentgateway "github.com/solo-io/kgateway-client/api/v1alpha1/enterpriseagentgateway"
-	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
+	v1alpha1enterpriseagentgateway "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterpriseagentgateway"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 

@@ -18,8 +18,8 @@ limitations under the License.
 package fake
 
 import (
-	v1 "github.com/solo-io/kgateway-client/external/extauth.solo.io/v1"
-	extauthsoloiov1 "github.com/solo-io/kgateway-client/clientset/versioned/typed/extauth.solo.io/v1"
+	v1 "github.com/solo-io/kgateway-client/v2/external/extauth.solo.io/v1"
+	extauthsoloiov1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/extauth.solo.io/v1"
 	gentype "k8s.io/client-go/gentype"
 )
 

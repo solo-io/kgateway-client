@@ -7,7 +7,7 @@ package enterprisekgateway
 import (
 	"github.com/kgateway-dev/kgateway/v2/api/v1alpha1/kgateway"
 	"github.com/kgateway-dev/kgateway/v2/api/v1alpha1/shared"
-	v1alpha1shared "github.com/solo-io/kgateway-client/api/v1alpha1/shared"
+	v1alpha1shared "github.com/solo-io/kgateway-client/v2/api/v1alpha1/shared"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

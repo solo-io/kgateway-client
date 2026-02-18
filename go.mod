@@ -1,4 +1,4 @@
-module github.com/solo-io/kgateway-client
+module github.com/solo-io/kgateway-client/v2
 
 go 1.25.7
 

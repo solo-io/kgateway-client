@@ -20,8 +20,8 @@ package enterprisekgateway
 import (
 	context "context"
 
-	v1alpha1enterprisekgateway "github.com/solo-io/kgateway-client/api/v1alpha1/enterprisekgateway"
-	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
+	v1alpha1enterprisekgateway "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisekgateway"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

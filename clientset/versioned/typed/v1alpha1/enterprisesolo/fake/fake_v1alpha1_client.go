@@ -18,7 +18,7 @@ limitations under the License.
 package fake
 
 import (
-	enterprisesolo "github.com/solo-io/kgateway-client/clientset/versioned/typed/v1alpha1/enterprisesolo"
+	enterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisesolo"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )

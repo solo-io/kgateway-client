@@ -20,8 +20,8 @@ package enterpriseagentgateway
 import (
 	context "context"
 
-	v1alpha1enterpriseagentgateway "github.com/solo-io/kgateway-client/api/v1alpha1/enterpriseagentgateway"
-	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
+	v1alpha1enterpriseagentgateway "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterpriseagentgateway"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
