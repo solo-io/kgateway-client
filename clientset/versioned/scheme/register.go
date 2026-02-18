@@ -21,7 +21,6 @@ import (
 	enterprisekgatewayenterpriseagentgateway "github.com/solo-io/kgateway-client/api/v1alpha1/enterpriseagentgateway"
 	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/api/v1alpha1/enterprisekgateway"
 	enterprisekgatewayenterprisesolo "github.com/solo-io/kgateway-client/api/v1alpha1/enterprisesolo"
-	enterprisekgatewaywaf "github.com/solo-io/kgateway-client/api/v1alpha1/waf"
 	extauthv1 "github.com/solo-io/kgateway-client/external/extauth.solo.io/v1"
 	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/external/ratelimit.solo.io/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,7 +39,6 @@ var localSchemeBuilder = runtime.SchemeBuilder{
 	enterprisekgatewayenterprisekgateway.AddToScheme,
 	enterprisekgatewayenterpriseagentgateway.AddToScheme,
 	enterprisekgatewayenterprisesolo.AddToScheme,
-	enterprisekgatewaywaf.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition
