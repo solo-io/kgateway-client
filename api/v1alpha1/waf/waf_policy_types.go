@@ -1,12 +1,12 @@
-package enterprisesolo
+package waf
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// +kubebuilder:rbac:groups=enterprise.solo.io,resources=wafpolicies,verbs=get;list;watch;update
-// +kubebuilder:rbac:groups=enterprise.solo.io,resources=wafpolicies/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=waf.solo.io,resources=wafpolicies,verbs=get;list;watch;update
+// +kubebuilder:rbac:groups=waf.solo.io,resources=wafpolicies/status,verbs=get;update;patch
 
 // +genclient
 // +kubebuilder:object:root=true
@@ -72,11 +72,11 @@ type DirectiveSource struct {
 // 	// Name is the name of the ConfigMap.
 // 	// +required
 // 	Name string `json:"name"`
-
+//
 // 	// Namespace is the namespace of the ConfigMap.
 // 	// +required
 // 	Namespace string `json:"namespace"`
-
+//
 // 	// Keys is a list of keys to use from the ConfigMap.
 // 	// If not set, all keys in the ConfigMap are used.
 // 	// +optional

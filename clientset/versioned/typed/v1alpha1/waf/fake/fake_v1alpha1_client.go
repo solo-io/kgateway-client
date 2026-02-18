@@ -18,22 +18,22 @@ limitations under the License.
 package fake
 
 import (
-	enterprisesolo "github.com/solo-io/kgateway-client/clientset/versioned/typed/v1alpha1/enterprisesolo"
+	waf "github.com/solo-io/kgateway-client/clientset/versioned/typed/v1alpha1/waf"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeEnterprisekgatewayEnterprisesolo struct {
+type FakeEnterprisekgatewayWaf struct {
 	*testing.Fake
 }
 
-func (c *FakeEnterprisekgatewayEnterprisesolo) EnterpriseListenerSets(namespace string) enterprisesolo.EnterpriseListenerSetInterface {
-	return newFakeEnterpriseListenerSets(c, namespace)
+func (c *FakeEnterprisekgatewayWaf) WAFPolicies(namespace string) waf.WAFPolicyInterface {
+	return newFakeWAFPolicies(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeEnterprisekgatewayEnterprisesolo) RESTClient() rest.Interface {
+func (c *FakeEnterprisekgatewayWaf) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }
