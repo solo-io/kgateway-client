@@ -18,11 +18,11 @@ limitations under the License.
 package scheme
 
 import (
-	enterprisekgatewayenterpriseagentgateway "github.com/solo-io/kgateway-client/api/v1alpha1/enterpriseagentgateway"
-	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/api/v1alpha1/enterprisekgateway"
-	enterprisekgatewayenterprisesolo "github.com/solo-io/kgateway-client/api/v1alpha1/enterprisesolo"
-	extauthv1 "github.com/solo-io/kgateway-client/external/extauth.solo.io/v1"
-	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/external/ratelimit.solo.io/v1alpha1"
+	enterprisekgatewayenterpriseagentgateway "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterpriseagentgateway"
+	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisekgateway"
+	enterprisekgatewayenterprisesolo "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisesolo"
+	extauthv1 "github.com/solo-io/kgateway-client/v2/external/extauth.solo.io/v1"
+	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/external/ratelimit.solo.io/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

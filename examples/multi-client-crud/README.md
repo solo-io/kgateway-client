@@ -4,7 +4,7 @@ This example demonstrates using all 3 clientsets in the same program:
 
 - Gateway API client (`sigs.k8s.io/gateway-api/pkg/client/clientset/versioned`)
 - Upstream kgateway client (`github.com/kgateway-dev/kgateway/v2/pkg/client/clientset/versioned`)
-- Solo Enterprise for kgateway client (`github.com/solo-io/kgateway-client/clientset/versioned`)
+- Solo Enterprise for kgateway client (`github.com/solo-io/kgateway-client/v2/clientset/versioned`)
 
 It performs create/get/update/list/delete operations for:
 

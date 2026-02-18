@@ -20,8 +20,8 @@ package v1alpha1
 import (
 	context "context"
 
-	ratelimitsoloiov1alpha1 "github.com/solo-io/kgateway-client/external/ratelimit.solo.io/v1alpha1"
-	scheme "github.com/solo-io/kgateway-client/clientset/versioned/scheme"
+	ratelimitsoloiov1alpha1 "github.com/solo-io/kgateway-client/v2/external/ratelimit.solo.io/v1alpha1"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

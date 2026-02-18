@@ -5,17 +5,17 @@
 If you want the latest published version of this library, use Go 1.16+ and run:
 
 ```sh
-go get github.com/solo-io/kgateway-client@latest
+go get github.com/solo-io/kgateway-client/v2@latest
 ```
 
-This records `github.com/solo-io/kgateway-client` in your module dependencies.
+This records `github.com/solo-io/kgateway-client/v2` in your module dependencies.
 
 ## Using a specific version
 
 If you want a specific release, fetch that tag directly:
 
 ```sh
-go get github.com/solo-io/kgateway-client@v2.1.1
+go get github.com/solo-io/kgateway-client/v2@v2.1.1
 ```
 
 `kgateway-client` versions align with Solo Enterprise for kgateway releases
@@ -27,7 +27,7 @@ Run these commands in your module:
 
 ```sh
 go mod tidy
-go list -m github.com/solo-io/kgateway-client
+go list -m github.com/solo-io/kgateway-client/v2
 ```
 
 ## Troubleshooting
@@ -37,7 +37,7 @@ go list -m github.com/solo-io/kgateway-client
 If you see package resolution errors, confirm you are using the full module path:
 
 ```go
-import "github.com/solo-io/kgateway-client/clientset/versioned"
+import "github.com/solo-io/kgateway-client/v2/clientset/versioned"
 ```
 
 ### Older Go versions
@@ -46,7 +46,7 @@ If you use an older Go toolchain and `@latest` resolves unexpectedly, pin an
 explicit version:
 
 ```sh
-go get github.com/solo-io/kgateway-client@v2.1.1
+go get github.com/solo-io/kgateway-client/v2@v2.1.1
 ```
 
 ### Dependency conflicts
@@ -54,7 +54,7 @@ go get github.com/solo-io/kgateway-client@v2.1.1
 If your project pulls incompatible Kubernetes dependencies, inspect your module graph:
 
 ```sh
-go mod graph | grep "github.com/solo-io/kgateway-client@"
+go mod graph | grep "github.com/solo-io/kgateway-client/v2@"
 ```
 
 Then pin compatible versions in your `go.mod` as needed.
