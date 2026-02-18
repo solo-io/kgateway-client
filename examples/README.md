@@ -30,6 +30,22 @@ Verify the CRD is present:
 kubectl get crd enterprisekgatewaytrafficpolicies.enterprisekgateway.solo.io
 ```
 
+For the `examples/multi-client-crud` example, also install Gateway API CRDs:
+
+```sh
+# Gateway API CRDs (version aligned with this repo's dependency)
+GW_API_VERSION=v1.4.1
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/"${GW_API_VERSION}"/standard-install.yaml
+```
+
+Verify Gateway API and kgateway CRDs:
+
+```sh
+kubectl get crd gateways.gateway.networking.k8s.io
+kubectl get crd httproutes.gateway.networking.k8s.io
+kubectl get crd trafficpolicies.gateway.kgateway.dev
+```
+
 CRD-only install is sufficient for these client examples and does not require a
 product license key.
 
@@ -83,7 +99,11 @@ Reference docs:
 
 ## Basics
 
-- [**Managing resources with API**](./create-update-delete-enterprisekgatewaytrafficpolicy):
+- [**Use all 3 clients together**](./multi-client-crud): Create, update, list,
+  and delete `Gateway`/`HTTPRoute` (Gateway API), `TrafficPolicy` (upstream
+  kgateway), and `EnterpriseKgatewayTrafficPolicy` (Solo Enterprise for
+  kgateway) in one program.
+- [**Managing resources with the API**](./create-update-delete-enterprisekgatewaytrafficpolicy):
   Create, get, update, list, and delete an `EnterpriseKgatewayTrafficPolicy`
   resource.
 

@@ -75,3 +75,9 @@ If the program is interrupted before delete completes, remove the resource with:
 ```sh
 kubectl delete enterprisekgatewaytrafficpolicies.enterprisekgateway.solo.io demo-enterprisekgateway-traffic-policy -n default
 ```
+
+If you installed CRDs only for this example, remove them with:
+
+```sh
+helm uninstall enterprise-kgateway-crds -n kgateway-system --ignore-not-found
+```
