@@ -134,4 +134,7 @@ gateways, _ := gwClient.GatewayV1().Gateways("default").List(ctx, metav1.ListOpt
 routes, _ := gwClient.GatewayV1().HTTPRoutes("default").List(ctx, metav1.ListOptions{})
 ```
 
+For a runnable end-to-end example that uses all 3 clients together, see
+[examples/multi-client-crud](examples/multi-client-crud).
+
 For installation troubleshooting, see [INSTALL.md](INSTALL.md).

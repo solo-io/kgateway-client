@@ -52,3 +52,9 @@ Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to stop.
 kubectl delete enterprisekgatewaytrafficpolicies.enterprisekgateway.solo.io \
   example-enterprisekgateway-traffic-policy -n default --ignore-not-found
 ```
+
+If you installed CRDs only for this example, remove them with:
+
+```sh
+helm uninstall enterprise-kgateway-crds -n kgateway-system --ignore-not-found
+```

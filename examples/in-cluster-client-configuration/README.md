@@ -14,12 +14,15 @@ Build a container image from the repository root:
 docker build -t kgateway-in-cluster:dev -f examples/in-cluster-client-configuration/Dockerfile .
 ```
 
-If you are using a local cluster runtime such as kind, load the local image
+If you are using a local cluster runtime such as [kind](https://kind.sigs.k8s.io/), load the local image
 into the cluster nodes:
 
 ```sh
 kind load docker-image kgateway-in-cluster:dev
 ```
+
+**Note:** If your cluster cannot access local images, push the image to a registry your
+cluster can pull from and use that image later in the `kubectl run` step.
 
 Install the Solo Enterprise for kgateway CRDs first (see
 `examples/README.md#cluster-prerequisites`) and verify the
@@ -53,9 +56,6 @@ kubectl run --rm -i demo \
   --env="NAMESPACE=default"
 ```
 
-If your cluster cannot access local images, push the image to a registry your
-cluster can pull from and use that image reference in `kubectl run`.
-
 Expected output (repeats every 10 seconds):
 
 ```text
@@ -74,4 +74,10 @@ kubectl delete rolebinding default-kgateway-client-view -n default --ignore-not-
 kubectl delete role kgateway-client-view -n default --ignore-not-found
 kubectl delete enterprisekgatewaytrafficpolicies.enterprisekgateway.solo.io \
   example-enterprisekgateway-traffic-policy -n default --ignore-not-found
+```
+
+If you installed CRDs only for this example, remove them with:
+
+```sh
+helm uninstall enterprise-kgateway-crds -n kgateway-system --ignore-not-found
 ```
