@@ -26,6 +26,7 @@ import (
 	enterprisekgatewayenterpriseagentgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterpriseagentgateway"
 	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisekgateway"
 	enterprisekgatewayenterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisesolo"
+	enterprisekgatewaywaf "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/waf"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -38,6 +39,7 @@ type Interface interface {
 	EnterprisekgatewayEnterprisekgateway() enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayInterface
 	EnterprisekgatewayEnterpriseagentgateway() enterprisekgatewayenterpriseagentgateway.EnterprisekgatewayEnterpriseagentgatewayInterface
 	EnterprisekgatewayEnterprisesolo() enterprisekgatewayenterprisesolo.EnterprisekgatewayEnterprisesoloInterface
+	EnterprisekgatewayWaf() enterprisekgatewaywaf.EnterprisekgatewayWafInterface
 }
 
 // Clientset contains the clients for groups.
@@ -48,6 +50,7 @@ type Clientset struct {
 	enterprisekgatewayEnterprisekgateway     *enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayClient
 	enterprisekgatewayEnterpriseagentgateway *enterprisekgatewayenterpriseagentgateway.EnterprisekgatewayEnterpriseagentgatewayClient
 	enterprisekgatewayEnterprisesolo         *enterprisekgatewayenterprisesolo.EnterprisekgatewayEnterprisesoloClient
+	enterprisekgatewayWaf                    *enterprisekgatewaywaf.EnterprisekgatewayWafClient
 }
 
 // ExtauthV1 retrieves the ExtauthV1Client
@@ -73,6 +76,11 @@ func (c *Clientset) EnterprisekgatewayEnterpriseagentgateway() enterprisekgatewa
 // EnterprisekgatewayEnterprisesolo retrieves the EnterprisekgatewayEnterprisesoloClient
 func (c *Clientset) EnterprisekgatewayEnterprisesolo() enterprisekgatewayenterprisesolo.EnterprisekgatewayEnterprisesoloInterface {
 	return c.enterprisekgatewayEnterprisesolo
+}
+
+// EnterprisekgatewayWaf retrieves the EnterprisekgatewayWafClient
+func (c *Clientset) EnterprisekgatewayWaf() enterprisekgatewaywaf.EnterprisekgatewayWafInterface {
+	return c.enterprisekgatewayWaf
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -139,6 +147,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
+	cs.enterprisekgatewayWaf, err = enterprisekgatewaywaf.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
 
 	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
@@ -165,6 +177,7 @@ func New(c rest.Interface) *Clientset {
 	cs.enterprisekgatewayEnterprisekgateway = enterprisekgatewayenterprisekgateway.New(c)
 	cs.enterprisekgatewayEnterpriseagentgateway = enterprisekgatewayenterpriseagentgateway.New(c)
 	cs.enterprisekgatewayEnterprisesolo = enterprisekgatewayenterprisesolo.New(c)
+	cs.enterprisekgatewayWaf = enterprisekgatewaywaf.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs
