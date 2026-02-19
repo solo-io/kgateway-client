@@ -7,7 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	i628e3ff870c842cad381b3d91bc4f1ce "github.com/solo-io/kgateway-client/external/enterprise.gloo.solo.io/v1"
+	i628e3ff870c842cad381b3d91bc4f1ce "github.com/solo-io/kgateway-client/v2/external/enterprise.gloo.solo.io/v1"
 )
 
 // +kubebuilder:skip

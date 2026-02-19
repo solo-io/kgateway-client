@@ -29,13 +29,13 @@ Solo Enterprise for kgateway.
 To get the latest version, use Go 1.16+:
 
 ```sh
-go get github.com/solo-io/kgateway-client@latest
+go get github.com/solo-io/kgateway-client/v2@latest
 ```
 
 To get a specific version:
 
 ```sh
-go get github.com/solo-io/kgateway-client@v2.1.1
+go get github.com/solo-io/kgateway-client/v2@v2.1.1
 ```
 
 See [INSTALL.md](INSTALL.md) for installation details and troubleshooting.
@@ -66,14 +66,14 @@ module your-project
 
 go 1.23
 
-require github.com/solo-io/kgateway-client v2.1.1
+require github.com/solo-io/kgateway-client/v2 v2.1.1
 ```
 
 After `go mod tidy`, your `go.mod` will include the resolved dependencies:
 
 ```go
 require (
-    github.com/solo-io/kgateway-client v2.1.1
+    github.com/solo-io/kgateway-client/v2 v2.1.1
     github.com/kgateway-dev/kgateway/v2 v2.2.0      // version from kgateway-client
     k8s.io/apimachinery v0.35.1
     k8s.io/client-go v0.35.1
@@ -85,7 +85,7 @@ The `kgateway` and `gateway-api` versions are determined by `kgateway-client`.
 When you upgrade `kgateway-client`, these dependencies update automatically:
 
 ```sh
-go get github.com/solo-io/kgateway-client@v2.2.0
+go get github.com/solo-io/kgateway-client/v2@v2.2.0
 go mod tidy
 ```
 
@@ -97,7 +97,7 @@ client and Gateway API client:
 ```go
 import (
     // Solo Enterprise for kgateway client
-    entkgatewayclient "github.com/solo-io/kgateway-client/clientset/versioned"
+    entkgatewayclient "github.com/solo-io/kgateway-client/v2/clientset/versioned"
 
     // Upstream kgateway client (version managed by kgateway-client)
     kgatewayclient "github.com/kgateway-dev/kgateway/v2/pkg/client/clientset/versioned"

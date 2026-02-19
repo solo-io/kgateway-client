@@ -25,9 +25,9 @@ import (
 
 	upstreamkgateway "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/kgateway"
 	upstreamshared "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/shared"
-	enterprisekgatewayv1alpha1 "github.com/solo-io/kgateway-client/api/v1alpha1/enterprisekgateway"
-	clientset "github.com/solo-io/kgateway-client/clientset/versioned"
-	typedenterprisekgatewayv1alpha1 "github.com/solo-io/kgateway-client/clientset/versioned/typed/v1alpha1/enterprisekgateway"
+	enterprisekgatewayv1alpha1 "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisekgateway"
+	clientset "github.com/solo-io/kgateway-client/v2/clientset/versioned"
+	typedenterprisekgatewayv1alpha1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisekgateway"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"

@@ -7,7 +7,7 @@ package enterpriseagentgateway
 import (
 	"github.com/kgateway-dev/kgateway/v2/api/v1alpha1/agentgateway"
 	"github.com/kgateway-dev/kgateway/v2/api/v1alpha1/shared"
-	v1alpha1shared "github.com/solo-io/kgateway-client/api/v1alpha1/shared"
+	v1alpha1shared "github.com/solo-io/kgateway-client/v2/api/v1alpha1/shared"
 	"k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"

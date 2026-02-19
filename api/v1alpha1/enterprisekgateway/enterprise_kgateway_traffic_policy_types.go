@@ -6,7 +6,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	"github.com/solo-io/kgateway-client/api/v1alpha1/shared"
+	"github.com/solo-io/kgateway-client/v2/api/v1alpha1/shared"
 )
 
 // +kubebuilder:rbac:groups=enterprisekgateway.solo.io,resources=enterprisekgatewaytrafficpolicies,verbs=get;list;watch;update
