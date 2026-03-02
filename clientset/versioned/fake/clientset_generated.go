@@ -23,8 +23,6 @@ import (
 	fakeextauthv1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/extauth.solo.io/v1/fake"
 	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/ratelimit.solo.io/v1alpha1"
 	fakeratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/ratelimit.solo.io/v1alpha1/fake"
-	enterprisekgatewayenterpriseagentgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterpriseagentgateway"
-	fakeenterprisekgatewayenterpriseagentgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterpriseagentgateway/fake"
 	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisekgateway"
 	fakeenterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisekgateway/fake"
 	enterprisekgatewayenterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisesolo"
@@ -110,11 +108,6 @@ func (c *Clientset) RatelimitV1alpha1() ratelimitv1alpha1.RatelimitV1alpha1Inter
 // EnterprisekgatewayEnterprisekgateway retrieves the EnterprisekgatewayEnterprisekgatewayClient
 func (c *Clientset) EnterprisekgatewayEnterprisekgateway() enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayInterface {
 	return &fakeenterprisekgatewayenterprisekgateway.FakeEnterprisekgatewayEnterprisekgateway{Fake: &c.Fake}
-}
-
-// EnterprisekgatewayEnterpriseagentgateway retrieves the EnterprisekgatewayEnterpriseagentgatewayClient
-func (c *Clientset) EnterprisekgatewayEnterpriseagentgateway() enterprisekgatewayenterpriseagentgateway.EnterprisekgatewayEnterpriseagentgatewayInterface {
-	return &fakeenterprisekgatewayenterpriseagentgateway.FakeEnterprisekgatewayEnterpriseagentgateway{Fake: &c.Fake}
 }
 
 // EnterprisekgatewayEnterprisesolo retrieves the EnterprisekgatewayEnterprisesoloClient

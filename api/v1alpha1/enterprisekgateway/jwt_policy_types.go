@@ -10,7 +10,6 @@ import (
 // +kubebuilder:validation:XValidation:rule="has(self.afterExtAuth) || has(self.beforeExtAuth)",message="for staged JWT usage, at least one stage must be set"
 type StagedJWT struct {
 	// JWT configuration to be enforced after external auth has been processed (if it is present).
-	// Note: this is not currently supported for agentgateway.
 	// +optional
 	AfterExtAuth *EntJWT `json:"afterExtAuth,omitempty"`
 
@@ -26,9 +25,6 @@ type StagedJWT struct {
 type EntJWT struct {
 	// Providers maps a provider name to a JWT provider, configuring a way to authenticate JWTs.
 	// If specified, multiple providers will be `OR`-ed together and will allow validation to any of the providers.
-	// Note: agentgateway only supports a single provider. If more than one provider is specified,
-	// the first provider found with a local JWKS will be used,
-	// but order is not guaranteed to be respected due to the map type.
 	// +optional
 	// +kubebuilder:validation:MaxProperties=32
 	Providers map[string]JWTProvider `json:"providers,omitempty"`
@@ -39,7 +35,6 @@ type EntJWT struct {
 	ValidationPolicy *JwtValidationPolicy `json:"validationPolicy,omitempty"`
 
 	// Disable JWT authentication for this policy scope.
-	// Note: this is not currently supported for agentgateway.
 	// +optional
 	Disable *upstreamshared.PolicyDisable `json:"disable,omitempty"`
 }
@@ -59,7 +54,6 @@ type JWTProvider struct {
 	Issuer *string `json:"issuer,omitempty"`
 
 	// Where to find the JWT of the current provider.
-	// Note: agentgateway does not support token source configuration.
 	// +optional
 	TokenSource *TokenSource `json:"tokenSource,omitempty"`
 
@@ -69,19 +63,16 @@ type JWTProvider struct {
 	KeepToken *bool `json:"keepToken,omitempty"`
 
 	// What claims should be copied to upstream headers.
-	// Note: agentgateway does not support claimsToHeaders configuration.
 	// +optional
 	ClaimsToHeaders []ClaimToHeader `json:"claimsToHeaders,omitempty"`
 
 	// Used to verify time constraints, such as `exp` and `npf`. If omitted, defaults to 60s
-	// Note: agentgateway does not support clockSkewSeconds configuration.
 	// +optional
 	// +kubebuilder:validation:Minimum=0
 	ClockSkewSeconds *int32 `json:"clockSkewSeconds,omitempty"`
 
 	// When this field is set, the specified value is used as the key in DynamicMetadata to store the JWT failure status code
 	// and message under that key. This field is particularly useful when logging the failure status.
-	// Note: agentgateway does not support attachFailedStatusToMetadata configuration.
 	// For example, if the value of `attach_failed_status_to_metadata` is 'custom_auth_failure_status' then
 	// the failure status can be accessed in the access log as '%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:custom_auth_failure_status)'
 	// Note: status code and message can be individually accessed as '%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:custom_auth_failure_status.code)' and '%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:custom_auth_failure_status.message)' respectively.
@@ -113,7 +104,6 @@ type JWKS struct {
 	Local *LocalJWKS `json:"local,omitempty"`
 
 	// Remote is used when the JWKS should be fetched from a remote host
-	// Note: agentgateway does not support remote JWKS configuration.
 	// +optional
 	Remote *RemoteJWKS `json:"remote,omitempty"`
 }
