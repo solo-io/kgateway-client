@@ -36,10 +36,18 @@ make validate-refs
 The suite runs `go test ./...` in isolated git worktrees for each ref and
 returns non-zero if any ref fails.
 
+Use the example matrix test suite to compile/test each directory under
+`examples/` for `main` and all repository tags:
+
+```sh
+make validate-examples
+```
+
 You can also pass explicit refs:
 
 ```sh
-make validate-refs REFS="main v2.1.2 v2.2.0-beta.4"
+make validate-refs REFS="main v2.2.0-beta.2 v2.2.0-beta.4"
+make validate-examples REFS="main v2.2.0-beta.2 v2.2.0-beta.4"
 ```
 
 ## How to get it
