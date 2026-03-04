@@ -1,0 +1,86 @@
+name: sync PR checks and auto-merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  sync-pr-ci:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'sync/gloo-gateway-clientset' &&
+      !github.event.pull_request.draft
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Compile-check exported packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./api/... ./clientset/... -run '^$'
+
+  enable-auto-merge:
+    if: >-
+      github.event_name == 'pull_request_target' &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'sync/gloo-gateway-clientset' &&
+      !github.event.pull_request.draft &&
+      vars.SYNC_PR_AUTHOR_LOGIN != '' &&
+      (
+        github.event.pull_request.user.login == vars.SYNC_PR_AUTHOR_LOGIN ||
+        github.event.pull_request.user.login == format('{0}[bot]', vars.SYNC_PR_AUTHOR_LOGIN)
+      )
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Enable auto-merge for trusted sync PR
+        shell: bash
+        run: |
+          set -euo pipefail
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          AUTO_MERGE_ENABLED="$(gh pr view "${PR_NUMBER}" --repo "${{ github.repository }}" --json autoMergeRequest --jq '.autoMergeRequest != null')"
+
+          if [[ "${AUTO_MERGE_ENABLED}" == "true" ]]; then
+            echo "Auto-merge is already enabled for #${PR_NUMBER}"
+            exit 0
+          fi
+
+          gh pr merge "${PR_NUMBER}" \
+            --repo "${{ github.repository }}" \
+            --auto \
+            --squash \
+            --delete-branch=false
