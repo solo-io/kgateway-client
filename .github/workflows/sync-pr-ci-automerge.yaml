@@ -56,10 +56,7 @@ jobs:
       github.event.pull_request.head.ref == 'sync/gloo-gateway-clientset' &&
       !github.event.pull_request.draft &&
       vars.SYNC_PR_AUTHOR_LOGIN != '' &&
-      (
-        github.event.pull_request.user.login == vars.SYNC_PR_AUTHOR_LOGIN ||
-        github.event.pull_request.user.login == format('{0}[bot]', vars.SYNC_PR_AUTHOR_LOGIN)
-      )
+      github.event.pull_request.user.login == vars.SYNC_PR_AUTHOR_LOGIN
     runs-on: ubuntu-22.04
     permissions:
       contents: write
