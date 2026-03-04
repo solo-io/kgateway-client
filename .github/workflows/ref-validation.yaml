@@ -55,6 +55,13 @@ jobs:
             else
               echo "refs=" >> "$GITHUB_OUTPUT"
             fi
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            latest_tag="$(git for-each-ref --sort=-version:refname --format='%(refname:short)' refs/tags | head -n 1)"
+            if [[ -n "${latest_tag}" ]]; then
+              echo "refs=${latest_tag}" >> "$GITHUB_OUTPUT"
+            else
+              echo "refs=main" >> "$GITHUB_OUTPUT"
+            fi
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
             echo "refs=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           else

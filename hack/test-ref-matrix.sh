@@ -42,11 +42,32 @@ cleanup() {
 # Ensure temporary worktrees and logs are removed on all script exits.
 trap cleanup EXIT
 
+resolve_ref() {
+	local ref="$1"
+
+	if git rev-parse --verify --quiet "${ref}^{commit}" >/dev/null; then
+		echo "${ref}"
+		return 0
+	fi
+
+	if [[ "${ref}" != origin/* ]] && git rev-parse --verify --quiet "origin/${ref}^{commit}" >/dev/null; then
+		echo "origin/${ref}"
+		return 0
+	fi
+
+	if [[ "${ref}" != refs/remotes/origin/* ]] && git rev-parse --verify --quiet "refs/remotes/origin/${ref}^{commit}" >/dev/null; then
+		echo "refs/remotes/origin/${ref}"
+		return 0
+	fi
+
+	return 1
+}
+
 echo "Testing refs with: go test ./..."
 printf "%-24s %-7s %s\n" "REF" "RESULT" "LOG"
 
 for ref in "${refs[@]}"; do
-	if ! git rev-parse --verify --quiet "${ref}^{commit}" >/dev/null; then
+	if ! resolved_ref="$(resolve_ref "${ref}")"; then
 		printf "%-24s %-7s %s\n" "${ref}" "MISSING" "-"
 		failures+=("${ref}")
 		continue
@@ -57,7 +78,7 @@ for ref in "${refs[@]}"; do
 	log="${tmp_dir}/${safe_ref}.log"
 	worktrees+=("${wt}")
 
-	git worktree add --detach "${wt}" "${ref}" >/dev/null 2>&1
+	git worktree add --detach "${wt}" "${resolved_ref}" >/dev/null 2>&1
 	if (
 		cd "${wt}"
 		export GOWORK=off
