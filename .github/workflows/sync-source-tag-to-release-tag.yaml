@@ -1,0 +1,74 @@
+name: sync source tag to release tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-release-tag:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve Source-Tag from merge commit metadata
+        id: source_tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          COMMIT_MESSAGE="$(git log -1 --pretty=%B "${GITHUB_SHA}")"
+
+          SOURCE_TAG="$(printf '%s\n' "${COMMIT_MESSAGE}" | sed -n 's/^Source-Tag:[[:space:]]*//p' | head -n 1)"
+          if [[ -z "${SOURCE_TAG}" ]]; then
+            SOURCE_TAG="$(printf '%s\n' "${COMMIT_MESSAGE}" | sed -n -E 's/^- Source tag:[[:space:]]*`?([^`]+)`?$/\1/p' | head -n 1)"
+          fi
+
+          if [[ -z "${SOURCE_TAG}" ]]; then
+            echo "No Source-Tag metadata found on ${GITHUB_SHA}; skipping tag sync"
+            echo "target_tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${SOURCE_TAG}" == v* ]]; then
+            TARGET_TAG="${SOURCE_TAG}"
+          else
+            TARGET_TAG="v${SOURCE_TAG}"
+          fi
+
+          echo "source_tag=${SOURCE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "target_tag=${TARGET_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Create release tag from Source-Tag
+        if: steps.source_tag.outputs.target_tag != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TARGET_TAG="${{ steps.source_tag.outputs.target_tag }}"
+          SOURCE_TAG="${{ steps.source_tag.outputs.source_tag }}"
+          # Prefer dereferenced tag SHA for annotated tags; fall back to direct refs for lightweight tags.
+          EXISTING_SHA="$(git ls-remote --tags origin "refs/tags/${TARGET_TAG}^{}" | awk '{print $1}' | head -n 1)"
+          if [[ -z "${EXISTING_SHA}" ]]; then
+            EXISTING_SHA="$(git ls-remote --tags origin "refs/tags/${TARGET_TAG}" | awk '{print $1}' | head -n 1)"
+          fi
+
+          if [[ -n "${EXISTING_SHA}" ]]; then
+            if [[ "${EXISTING_SHA}" == "${GITHUB_SHA}" ]]; then
+              echo "${TARGET_TAG} already points to ${GITHUB_SHA}; no action needed"
+              exit 0
+            fi
+            git tag -f "${TARGET_TAG}" "${GITHUB_SHA}"
+            git push origin "refs/tags/${TARGET_TAG}" --force
+            echo "Retargeted ${TARGET_TAG} from ${EXISTING_SHA} to ${GITHUB_SHA} (Source-Tag ${SOURCE_TAG})"
+            exit 0
+          fi
+
+          git tag "${TARGET_TAG}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${TARGET_TAG}"
+          echo "Created ${TARGET_TAG} from Source-Tag ${SOURCE_TAG} at ${GITHUB_SHA}"
