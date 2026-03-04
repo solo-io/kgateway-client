@@ -24,6 +24,24 @@ See [semver](https://semver.org/) for definitions of major, minor, and patch.
 The HEAD of the `main` branch in `kgateway-client` tracks the HEAD of `main` in
 Solo Enterprise for kgateway.
 
+## Build Validation Suite
+
+Use the ref matrix test suite to validate compilation/test health for `main` and
+all repository tags:
+
+```sh
+make validate-refs
+```
+
+The suite runs `go test ./...` in isolated git worktrees for each ref and
+returns non-zero if any ref fails.
+
+You can also pass explicit refs:
+
+```sh
+make validate-refs REFS="main v2.1.2 v2.2.0-beta.4"
+```
+
 ## How to get it
 
 To get the latest version, use Go 1.16+:

@@ -1,0 +1,74 @@
+name: Ref Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      refs:
+        description: "Space-separated refs to test (default: main and all tags)"
+        required: false
+        type: string
+
+concurrency:
+  group: ref-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags and main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force --tags origin
+          git fetch --force origin main:refs/remotes/origin/main
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Resolve refs to test
+        id: resolve-refs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ -n "${{ inputs.refs }}" ]]; then
+              echo "refs=${{ inputs.refs }}" >> "$GITHUB_OUTPUT"
+            else
+              echo "refs=" >> "$GITHUB_OUTPUT"
+            fi
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
+            echo "refs=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "refs=main" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run ref validation suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          refs="${{ steps.resolve-refs.outputs.refs }}"
+          if [[ -n "${refs}" ]]; then
+            read -r -a ref_array <<< "${refs}"
+            ./hack/test-ref-matrix.sh "${ref_array[@]}"
+          else
+            ./hack/test-ref-matrix.sh
+          fi
