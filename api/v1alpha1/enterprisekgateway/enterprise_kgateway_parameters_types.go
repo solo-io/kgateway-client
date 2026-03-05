@@ -2,6 +2,7 @@ package enterprisekgateway
 
 import (
 	upstream "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/kgateway"
+	"github.com/kgateway-dev/kgateway/v2/api/v1alpha1/shared"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -97,32 +98,13 @@ type EnterpriseKgatewayKubernetesProxyConfig struct {
 	// +optional
 	OmitDefaultSecurityContext *bool `json:"omitDefaultSecurityContext,omitempty"`
 
+	// GatewayParametersOverlays contains overlay fields for proxy deployment resources.
+	// These allow applying strategic merge patches and creating HPA/PDB/VPA resources.
+	upstream.GatewayParametersOverlays `json:",inline"`
+
 	// SharedExtensions defines extensions that are shared across all Gateways of the same GatewayClass
 	// +optional
 	SharedExtensions *Extensions `json:"sharedExtensions,omitempty"`
-}
-
-type Agentgateway struct {
-	upstream.Agentgateway `json:",inline"`
-
-	// CA is the certificate authority configuration.
-	// +optional
-	CA *CA `json:"ca,omitempty"`
-
-	// IstioClusterId is the ID of the cluster that this Istiod instance resides (default `Kubernetes`).
-	// +optional
-	IstioClusterId *string `json:"istioClusterId,omitempty"`
-}
-
-type CA struct {
-	// Address is the discovery address of the certificate authority.
-	// Default is https://istiod.istio-system.svc:15012
-	// +optional
-	Address *string `json:"address,omitempty"`
-
-	// TrustDomain is the trust domain of the certificate authority.
-	// +optional
-	TrustDomain *string `json:"trustDomain,omitempty"`
 }
 
 type EnterpriseKgatewayParametersStatus struct{}
@@ -192,6 +174,41 @@ type DeploymentConfiguration struct {
 	//
 	// +optional
 	Strategy *appsv1.DeploymentStrategy `json:"strategy,omitempty"`
+
+	// DeploymentOverlay allows specifying overrides for the generated Deployment resource.
+	// Use this for advanced customization not covered by the typed config fields,
+	// such as adding initContainers, sidecars, or removing security contexts for OpenShift.
+	// +optional
+	DeploymentOverlay *shared.KubernetesResourceOverlay `json:"deploymentOverlay,omitempty"`
+
+	// ServiceOverlay allows specifying overrides for the generated Service resource.
+	// +optional
+	ServiceOverlay *shared.KubernetesResourceOverlay `json:"serviceOverlay,omitempty"`
+
+	// ServiceAccountOverlay allows specifying overrides for the generated ServiceAccount resource.
+	// +optional
+	ServiceAccountOverlay *shared.KubernetesResourceOverlay `json:"serviceAccountOverlay,omitempty"`
+
+	// PodDisruptionBudget allows creating a PodDisruptionBudget for this extension.
+	// If absent, no PDB is created. If present, a PDB is created with its selector
+	// automatically configured to target the extension Deployment.
+	// The metadata and spec fields from this overlay are applied to the generated PDB.
+	// +optional
+	PodDisruptionBudget *shared.KubernetesResourceOverlay `json:"podDisruptionBudget,omitempty"`
+
+	// HorizontalPodAutoscaler allows creating a HorizontalPodAutoscaler for this extension.
+	// If absent, no HPA is created. If present, an HPA is created with its scaleTargetRef
+	// automatically configured to target the extension Deployment.
+	// The metadata and spec fields from this overlay are applied to the generated HPA.
+	// +optional
+	HorizontalPodAutoscaler *shared.KubernetesResourceOverlay `json:"horizontalPodAutoscaler,omitempty"`
+
+	// VerticalPodAutoscaler allows creating a VerticalPodAutoscaler for this extension.
+	// If absent, no VPA is created. If present, a VPA is created with its targetRef
+	// automatically configured to target the extension Deployment.
+	// The metadata and spec fields from this overlay are applied to the generated VPA.
+	// +optional
+	VerticalPodAutoscaler *shared.KubernetesResourceOverlay `json:"verticalPodAutoscaler,omitempty"`
 }
 
 type ContainerConfiguration struct {

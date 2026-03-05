@@ -30,7 +30,7 @@ type RequestBodyParse string
 const (
 	// ParseAsJson configures the transformation to attempt to parse the request/response body as JSON
 	ParseAsJson RequestBodyParse = "ParseAsJson"
-	// DontParse configures the transformation request/response body will be treated as plain text
+	// DontParse configures the transformation so that the request/response body is treated as plain text. The request/response is buffered, but not parsed as JSON.
 	DontParse RequestBodyParse = "DontParse"
 )
 

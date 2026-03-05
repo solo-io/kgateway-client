@@ -1,10 +1,10 @@
 module github.com/solo-io/kgateway-client/v2
 
-go 1.25.7
+go 1.26.0
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/kgateway-dev/kgateway/v2 v2.2.2-0.20260219205724-0c66f111fac6
+	github.com/kgateway-dev/kgateway/v2 v2.3.0-beta.2.0.20260302192636-4e63b3eb14b3
 	github.com/solo-io/protoc-gen-ext v0.1.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20251213004720-97cd9d5aeac2
 	google.golang.org/protobuf v1.36.11
@@ -45,11 +45,11 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
-	golang.org/x/term v0.38.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
