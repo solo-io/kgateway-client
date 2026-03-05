@@ -23,9 +23,9 @@ import (
 
 	extauthv1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/extauth.solo.io/v1"
 	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/ratelimit.solo.io/v1alpha1"
-	enterprisekgatewayenterpriseagentgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterpriseagentgateway"
 	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisekgateway"
 	enterprisekgatewayenterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisesolo"
+	enterprisekgatewaywaf "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/waf"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -36,18 +36,18 @@ type Interface interface {
 	ExtauthV1() extauthv1.ExtauthV1Interface
 	RatelimitV1alpha1() ratelimitv1alpha1.RatelimitV1alpha1Interface
 	EnterprisekgatewayEnterprisekgateway() enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayInterface
-	EnterprisekgatewayEnterpriseagentgateway() enterprisekgatewayenterpriseagentgateway.EnterprisekgatewayEnterpriseagentgatewayInterface
 	EnterprisekgatewayEnterprisesolo() enterprisekgatewayenterprisesolo.EnterprisekgatewayEnterprisesoloInterface
+	EnterprisekgatewayWaf() enterprisekgatewaywaf.EnterprisekgatewayWafInterface
 }
 
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	extauthV1                                *extauthv1.ExtauthV1Client
-	ratelimitV1alpha1                        *ratelimitv1alpha1.RatelimitV1alpha1Client
-	enterprisekgatewayEnterprisekgateway     *enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayClient
-	enterprisekgatewayEnterpriseagentgateway *enterprisekgatewayenterpriseagentgateway.EnterprisekgatewayEnterpriseagentgatewayClient
-	enterprisekgatewayEnterprisesolo         *enterprisekgatewayenterprisesolo.EnterprisekgatewayEnterprisesoloClient
+	extauthV1                            *extauthv1.ExtauthV1Client
+	ratelimitV1alpha1                    *ratelimitv1alpha1.RatelimitV1alpha1Client
+	enterprisekgatewayEnterprisekgateway *enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayClient
+	enterprisekgatewayEnterprisesolo     *enterprisekgatewayenterprisesolo.EnterprisekgatewayEnterprisesoloClient
+	enterprisekgatewayWaf                *enterprisekgatewaywaf.EnterprisekgatewayWafClient
 }
 
 // ExtauthV1 retrieves the ExtauthV1Client
@@ -65,14 +65,14 @@ func (c *Clientset) EnterprisekgatewayEnterprisekgateway() enterprisekgatewayent
 	return c.enterprisekgatewayEnterprisekgateway
 }
 
-// EnterprisekgatewayEnterpriseagentgateway retrieves the EnterprisekgatewayEnterpriseagentgatewayClient
-func (c *Clientset) EnterprisekgatewayEnterpriseagentgateway() enterprisekgatewayenterpriseagentgateway.EnterprisekgatewayEnterpriseagentgatewayInterface {
-	return c.enterprisekgatewayEnterpriseagentgateway
-}
-
 // EnterprisekgatewayEnterprisesolo retrieves the EnterprisekgatewayEnterprisesoloClient
 func (c *Clientset) EnterprisekgatewayEnterprisesolo() enterprisekgatewayenterprisesolo.EnterprisekgatewayEnterprisesoloInterface {
 	return c.enterprisekgatewayEnterprisesolo
+}
+
+// EnterprisekgatewayWaf retrieves the EnterprisekgatewayWafClient
+func (c *Clientset) EnterprisekgatewayWaf() enterprisekgatewaywaf.EnterprisekgatewayWafInterface {
+	return c.enterprisekgatewayWaf
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -131,11 +131,11 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
-	cs.enterprisekgatewayEnterpriseagentgateway, err = enterprisekgatewayenterpriseagentgateway.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.enterprisekgatewayEnterprisesolo, err = enterprisekgatewayenterprisesolo.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
-	cs.enterprisekgatewayEnterprisesolo, err = enterprisekgatewayenterprisesolo.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.enterprisekgatewayWaf, err = enterprisekgatewaywaf.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -163,8 +163,8 @@ func New(c rest.Interface) *Clientset {
 	cs.extauthV1 = extauthv1.New(c)
 	cs.ratelimitV1alpha1 = ratelimitv1alpha1.New(c)
 	cs.enterprisekgatewayEnterprisekgateway = enterprisekgatewayenterprisekgateway.New(c)
-	cs.enterprisekgatewayEnterpriseagentgateway = enterprisekgatewayenterpriseagentgateway.New(c)
 	cs.enterprisekgatewayEnterprisesolo = enterprisekgatewayenterprisesolo.New(c)
+	cs.enterprisekgatewayWaf = enterprisekgatewaywaf.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

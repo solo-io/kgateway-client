@@ -1,6 +1,6 @@
-package enterpriseagentgateway
+package waf
 
 // +k8s:openapi-gen=true
 // +kubebuilder:object:generate=true
-// +groupName=enterpriseagentgateway.solo.io
+// +groupName=waf.solo.io
 // +versionName=v1alpha1
