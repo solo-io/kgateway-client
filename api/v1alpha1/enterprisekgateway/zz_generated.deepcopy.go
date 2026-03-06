@@ -350,8 +350,8 @@ func (in *EntWAF) DeepCopyInto(out *EntWAF) {
 		*out = new(v1alpha1shared.WAFPolicyRef)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.WAFServer != nil {
-		in, out := &in.WAFServer, &out.WAFServer
+	if in.WAFServerRef != nil {
+		in, out := &in.WAFServerRef, &out.WAFServerRef
 		*out = new(apisv1.BackendObjectReference)
 		(*in).DeepCopyInto(*out)
 	}
