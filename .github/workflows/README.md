@@ -67,6 +67,8 @@ Validates and merges trusted sync PRs opened against `main`.
   - only for branch `sync/gloo-gateway-clientset`
   - only when the PR author matches `SYNC_PR_AUTHOR_LOGIN`
   - uses the configured sync GitHub App token
+  - checks out the base repository and delegates the wait-and-merge logic to
+    `./hack/merge-sync-pr.sh`
   - waits for the expected sync PR checks to pass
   - merges the PR directly as the sync app so ruleset bypass applies
   - leaves the sync branch in place with `--delete-branch=false`
