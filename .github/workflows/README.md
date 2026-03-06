@@ -12,7 +12,7 @@ Runs the lightweight validation suite.
 
 - On `pull_request` to `main`:
   - `validate` tests the latest repo tag if one exists, otherwise `main`
-  - `validate-examples` runs the example compile/test matrix for the PR ref
+  - `validate-examples` runs the default example compile/test matrix (`main` and all tags)
 - On `push` to `main`:
   - validates `main`
 - On `push` to `v*` tags:
