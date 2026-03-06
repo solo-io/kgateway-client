@@ -18,10 +18,7 @@ limitations under the License.
 package scheme
 
 import (
-	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisekgateway"
-	enterprisekgatewaywaf "github.com/solo-io/kgateway-client/v2/api/v1alpha1/waf"
-	extauthv1 "github.com/solo-io/kgateway-client/v2/external/extauth.solo.io/v1"
-	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/external/ratelimit.solo.io/v1alpha1"
+	enterpriseenterprisesolo "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisesolo"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -33,10 +30,7 @@ var Scheme = runtime.NewScheme()
 var Codecs = serializer.NewCodecFactory(Scheme)
 var ParameterCodec = runtime.NewParameterCodec(Scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
-	extauthv1.AddToScheme,
-	ratelimitv1alpha1.AddToScheme,
-	enterprisekgatewayenterprisekgateway.AddToScheme,
-	enterprisekgatewaywaf.AddToScheme,
+	enterpriseenterprisesolo.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition
