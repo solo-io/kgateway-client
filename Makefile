@@ -1,4 +1,4 @@
-.PHONY: validate-refs validate-examples
+.PHONY: validate-refs validate-examples validate-examples-e2e
 
 validate-refs:
 ifeq ($(strip $(REFS)),)
@@ -12,4 +12,11 @@ ifeq ($(strip $(REFS)),)
 	./hack/test-example-matrix.sh
 else
 	./hack/test-example-matrix.sh $(REFS)
+endif
+
+validate-examples-e2e:
+ifeq ($(strip $(REFS)),)
+	./hack/test-example-e2e-matrix.sh
+else
+	./hack/test-example-e2e-matrix.sh $(REFS)
 endif

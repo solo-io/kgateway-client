@@ -17,12 +17,11 @@ limitations under the License.
 package main
 
 import (
-	"bufio"
 	"context"
 	"flag"
 	"fmt"
-	"os"
 	"path/filepath"
+	"time"
 
 	upstreamkgateway "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/kgateway"
 	upstreamshared "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/shared"
@@ -48,12 +47,14 @@ const (
 func main() {
 	var kubeconfig *string
 	var namespace string
+	var stepDelay time.Duration
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
 	flag.StringVar(&namespace, "namespace", defaultNamespace, "namespace where the EnterpriseKgatewayTrafficPolicy will be managed")
+	flag.DurationVar(&stepDelay, "step-delay", 3*time.Second, "time to wait between example operations")
 	flag.Parse()
 
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
@@ -76,7 +77,7 @@ func main() {
 	}
 	fmt.Printf("Created EnterpriseKgatewayTrafficPolicy %q.\n", result.GetName())
 
-	prompt()
+	sleepBetweenSteps(stepDelay)
 	fmt.Println("Updating EnterpriseKgatewayTrafficPolicy...")
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		latest, getErr := trafficPoliciesClient.Get(context.TODO(), resourceName, metav1.GetOptions{})
@@ -110,7 +111,7 @@ func main() {
 		updated.Generation,
 	)
 
-	prompt()
+	sleepBetweenSteps(stepDelay)
 	fmt.Printf("Listing EnterpriseKgatewayTrafficPolicies in namespace %q:\n", namespace)
 	list, err := trafficPoliciesClient.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -127,7 +128,7 @@ func main() {
 		)
 	}
 
-	prompt()
+	sleepBetweenSteps(stepDelay)
 	fmt.Println("Deleting EnterpriseKgatewayTrafficPolicy...")
 	deletePolicy := metav1.DeletePropagationForeground
 	if err := trafficPoliciesClient.Delete(context.TODO(), resourceName, metav1.DeleteOptions{
@@ -178,14 +179,13 @@ func firstTargetRefName(policy *enterprisekgatewayv1alpha1.EnterpriseKgatewayTra
 	return string(policy.Spec.TargetRefs[0].Name)
 }
 
-func prompt() {
-	fmt.Printf("-> Press Return key to continue.")
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		break
+func sleepBetweenSteps(stepDelay time.Duration) {
+	if stepDelay < 0 {
+		stepDelay = 0
 	}
-	if err := scanner.Err(); err != nil {
-		panic(err)
+	if stepDelay == 0 {
+		return
 	}
-	fmt.Println()
+	fmt.Printf("Waiting %s before next step...\n", stepDelay)
+	time.Sleep(stepDelay)
 }

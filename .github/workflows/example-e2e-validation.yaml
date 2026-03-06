@@ -1,0 +1,87 @@
+name: Examples E2E Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - sync/tag-*
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      refs:
+        description: "Space-separated refs to test (default: main and all tags; pull_request runs only PR head)"
+        required: false
+        type: string
+
+concurrency:
+  group: example-e2e-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-examples-e2e:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags and main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force --tags origin
+          git fetch --force origin main:refs/remotes/origin/main
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.3.0
+
+      - name: Install kind
+        uses: helm/kind-action@v1.12.0
+        with:
+          install_only: true
+
+      - name: Resolve refs to test
+        id: resolve-refs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ -n "${{ inputs.refs }}" ]]; then
+              echo "refs=${{ inputs.refs }}" >> "$GITHUB_OUTPUT"
+            else
+              echo "refs=" >> "$GITHUB_OUTPUT"
+            fi
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "refs=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "refs=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run example e2e validation suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          refs="${{ steps.resolve-refs.outputs.refs }}"
+          if [[ -n "${refs}" ]]; then
+            read -r -a ref_array <<< "${refs}"
+            ./hack/test-example-e2e-matrix.sh "${ref_array[@]}"
+          else
+            ./hack/test-example-e2e-matrix.sh
+          fi

@@ -16,13 +16,31 @@ for the open source [kgateway project](https://kgateway.dev/) are **not** includ
 
 Versioning aligns with Solo Enterprise for kgateway releases, for example `v2.x.y`.
 
-### Branches and tags
-
-A new tag is created for each minor or patch increment.
-See [semver](https://semver.org/) for definitions of major, minor, and patch.
-
-The HEAD of the `main` branch in `kgateway-client` tracks the HEAD of `main` in
+The HEAD of `main` in `kgateway-client` tracks the synced HEAD of `main` from
 Solo Enterprise for kgateway.
+
+### Tagging Strategy
+
+Tags in this repository are created by automation and use a leading `v`
+prefix, for example `v2.2.0-beta.4`.
+
+- The source sync workflow in `solo-io/gloo-gateway` includes `Source-Tag`
+  metadata when a source release tag is being propagated.
+- After the sync PR merges to `main`, this repo's
+  `sync-source-tag-to-release-tag.yaml` workflow reads that metadata and creates
+  the matching tag in `kgateway-client`.
+- The tag is created from the merge commit in this repository, not from a
+  commit in the source repository.
+- If the source metadata does not include a leading `v`, the workflow adds it
+  so published tags follow normal Go module tagging conventions.
+- If a corrected sync for the same source tag is merged later, the workflow can
+  retarget the existing tag to the newer merge commit.
+- The `sync/gloo-gateway-clientset` branch is a long-lived automation branch
+  used to open or update sync PRs against `main`; it is intentionally reused
+  across sync runs and is not auto-deleted after merges.
+
+This means `main` can move ahead of the most recent published tag, while tags
+identify specific synced release points that are safe to consume from Go.
 
 ## Build Validation Suite
 
@@ -43,11 +61,19 @@ Use the example matrix test suite to compile/test each directory under
 make validate-examples
 ```
 
+Use the example e2e suite to run live-cluster example validation (kind + CRDs)
+for `main` and all repository tags:
+
+```sh
+make validate-examples-e2e
+```
+
 You can also pass explicit refs:
 
 ```sh
 make validate-refs REFS="main v2.2.0-beta.2 v2.2.0-beta.4"
 make validate-examples REFS="main v2.2.0-beta.2 v2.2.0-beta.4"
+make validate-examples-e2e REFS="main v2.2.0-beta.4"
 ```
 
 ## How to get it

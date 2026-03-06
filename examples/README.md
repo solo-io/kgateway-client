@@ -30,13 +30,28 @@ Verify the CRD is present:
 kubectl get crd enterprisekgatewaytrafficpolicies.enterprisekgateway.solo.io
 ```
 
-For the `examples/multi-client-crud` example, also install Gateway API CRDs:
+For the `examples/multi-client-crud` example, also install the upstream
+kgateway and Gateway API CRDs:
 
 ```sh
+# Upstream kgateway CRDs required for TrafficPolicy.
+# For released refs, this should match the version of github.com/kgateway-dev/kgateway/v2 in go.mod.
+UPSTREAM_KGW_VERSION="$(go list -m -f '{{.Version}}' github.com/kgateway-dev/kgateway/v2)"
+
+helm upgrade --install kgateway-crds \
+  oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
+  --version "${UPSTREAM_KGW_VERSION}" \
+  --namespace kgateway-system \
+  --create-namespace
+
 # Gateway API CRDs (version aligned with this repo's dependency)
 GW_API_VERSION=v1.4.1
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/"${GW_API_VERSION}"/standard-install.yaml
 ```
+
+If `UPSTREAM_KGW_VERSION` resolves to a pseudo-version on an unreleased ref such
+as `main`, use the latest compatible published `kgateway-crds` chart version
+instead.
 
 Verify Gateway API and kgateway CRDs:
 

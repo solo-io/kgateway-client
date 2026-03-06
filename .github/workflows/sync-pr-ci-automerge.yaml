@@ -48,7 +48,7 @@ jobs:
           set -euo pipefail
           go test ./api/... ./clientset/... -run '^$'
 
-  enable-auto-merge:
+  merge-sync-pr:
     if: >-
       github.event_name == 'pull_request_target' &&
       github.event.pull_request.base.ref == 'main' &&
@@ -59,9 +59,13 @@ jobs:
       vars.SYNC_PR_AUTHOR_LOGIN != '' &&
       github.event.pull_request.user.login == vars.SYNC_PR_AUTHOR_LOGIN
     runs-on: ubuntu-22.04
+    timeout-minutes: 75
     permissions:
       contents: read
     steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v4
+
       - name: Create GitHub App token (sync app)
         id: app-token
         uses: actions/create-github-app-token@v2
@@ -73,22 +77,14 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
 
-      - name: Enable auto-merge for trusted sync PR
+      - name: Merge trusted sync PR
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EXPECTED_CHECKS: sync-pr-ci validate validate-examples validate-examples-e2e
+          SELF_CHECK_NAME: merge-sync-pr
         shell: bash
         run: |
-          set -euo pipefail
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          AUTO_MERGE_ENABLED="$(gh pr view "${PR_NUMBER}" --repo "${{ github.repository }}" --json autoMergeRequest --jq '.autoMergeRequest != null')"
-
-          if [[ "${AUTO_MERGE_ENABLED}" == "true" ]]; then
-            echo "Auto-merge is already enabled for #${PR_NUMBER}"
-            exit 0
-          fi
-
-          gh pr merge "${PR_NUMBER}" \
-            --repo "${{ github.repository }}" \
-            --auto \
-            --squash \
-            --delete-branch=false
+          ./hack/merge-sync-pr.sh
