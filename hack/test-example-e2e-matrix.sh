@@ -382,16 +382,21 @@ EOF
 			--restart=Never \
 			--env="NAMESPACE=default"
 
-		KUBECONFIG="${kubeconfig_path}" kubectl wait --for=condition=Ready "pod/${pod_name}" -n default --timeout=180s
-
-		for _ in $(seq 1 20); do
+		for _ in $(seq 1 40); do
 			KUBECONFIG="${kubeconfig_path}" kubectl logs "${pod_name}" -n default >>"${log}" 2>/dev/null || true
 			if grep -q 'Found EnterpriseKgatewayTrafficPolicy "example-enterprisekgateway-traffic-policy"' "${log}"; then
 				exit 0
 			fi
+
+			pod_phase="$(KUBECONFIG="${kubeconfig_path}" kubectl get pod "${pod_name}" -n default -o jsonpath='{.status.phase}' 2>/dev/null || true)"
+			if [[ "${pod_phase}" == "Failed" || "${pod_phase}" == "Succeeded" || "${pod_phase}" == "Unknown" ]]; then
+				break
+			fi
 			sleep 3
 		done
 
+		KUBECONFIG="${kubeconfig_path}" kubectl logs "${pod_name}" -n default >>"${log}" 2>&1 || true
+		KUBECONFIG="${kubeconfig_path}" kubectl get pod "${pod_name}" -n default -o yaml >>"${log}" 2>&1 || true
 		KUBECONFIG="${kubeconfig_path}" kubectl describe pod "${pod_name}" -n default >>"${log}" 2>&1 || true
 		exit 1
 	) >"${log}" 2>&1; then
