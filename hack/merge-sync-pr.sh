@@ -138,6 +138,7 @@ fi
 
 gh pr merge "${PR_NUMBER}" \
 	--repo "${GITHUB_REPOSITORY}" \
+	--admin \
 	--squash \
 	--match-head-commit "${PR_HEAD_SHA}" \
 	--delete-branch=false

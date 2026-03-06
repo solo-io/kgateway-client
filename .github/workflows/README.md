@@ -71,7 +71,8 @@ Validates and merges trusted sync PRs opened against `main`.
   - checks out the base repository and delegates the wait-and-merge logic to
     `./hack/merge-sync-pr.sh`
   - waits for the expected sync PR checks to pass
-  - merges the PR directly as the sync app so ruleset bypass applies
+  - merges the PR directly as the sync app with administrator privileges so the
+    configured ruleset bypass applies
   - leaves the sync branch in place with `--delete-branch=false`
 
 Required repo configuration:
