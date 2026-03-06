@@ -78,7 +78,7 @@ make validate-examples-e2e REFS="main v2.2.0-beta.4"
 
 ## How to get it
 
-To get the latest version, use Go 1.16+:
+To get the latest version, use Go 1.26.0+:
 
 ```sh
 go get github.com/solo-io/kgateway-client/v2@latest
@@ -116,7 +116,7 @@ resolved automatically:
 ```go
 module your-project
 
-go 1.23
+go 1.26.0
 
 require github.com/solo-io/kgateway-client/v2 v2.2.0-beta.4
 ```

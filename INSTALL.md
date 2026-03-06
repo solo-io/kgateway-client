@@ -2,7 +2,7 @@
 
 ## Using the latest version
 
-If you want the latest published version of this library, use Go 1.16+ and run:
+If you want the latest published version of this library, use Go 1.26.0+ and run:
 
 ```sh
 go get github.com/solo-io/kgateway-client/v2@latest
