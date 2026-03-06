@@ -36,6 +36,8 @@ Run the application with your kubeconfig:
 ./app
 # or specify kubeconfig/namespace
 ./app -kubeconfig=$HOME/.kube/config -namespace=default
+# adjust delay between operations (default: 3s)
+./app -step-delay=1s
 ```
 
 The application runs these operations in order:
@@ -47,22 +49,23 @@ The application runs these operations in order:
 3. List `EnterpriseKgatewayTrafficPolicy` objects in the namespace.
 4. Delete `demo-enterprisekgateway-traffic-policy`.
 
-Each step pauses for <kbd>Return</kbd> so you can inspect state with `kubectl`.
+Each step waits for `-step-delay` (default `3s`) so you can inspect state with
+`kubectl`.
 
 Example output:
 
 ```text
 Creating EnterpriseKgatewayTrafficPolicy...
 Created EnterpriseKgatewayTrafficPolicy "demo-enterprisekgateway-traffic-policy".
--> Press Return key to continue.
+Waiting 3s before next step...
 
 Updating EnterpriseKgatewayTrafficPolicy...
 Updated EnterpriseKgatewayTrafficPolicy (label examples.solo.io/updated="true", first targetRef.name="example-gateway-updated", generation=2).
--> Press Return key to continue.
+Waiting 3s before next step...
 
 Listing EnterpriseKgatewayTrafficPolicies in namespace "default":
  * demo-enterprisekgateway-traffic-policy (targetRef.name=example-gateway-updated, examples.solo.io/updated="true", entExtAuth.disable=true)
--> Press Return key to continue.
+Waiting 3s before next step...
 
 Deleting EnterpriseKgatewayTrafficPolicy...
 Deleted EnterpriseKgatewayTrafficPolicy.

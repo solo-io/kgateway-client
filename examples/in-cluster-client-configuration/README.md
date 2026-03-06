@@ -36,15 +36,37 @@ Grant the service account permission to read `EnterpriseKgatewayTrafficPolicy`
 resources in the target namespace (`default` in this example):
 
 ```sh
-kubectl create role kgateway-client-view \
-  --verb=get,list,watch,create \
-  --resource=enterprisekgatewaytrafficpolicies.enterprisekgateway.solo.io \
-  -n default
-
-kubectl create rolebinding default-kgateway-client-view \
-  --role=kgateway-client-view \
-  --serviceaccount=default:default \
-  -n default
+kubectl apply -f - <<'EOF'
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kgateway-client-view
+  namespace: default
+rules:
+- apiGroups:
+  - enterprisekgateway.solo.io
+  resources:
+  - enterprisekgatewaytrafficpolicies
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: default-kgateway-client-view
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kgateway-client-view
+EOF
 ```
 
 Run the image in a Pod:

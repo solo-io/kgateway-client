@@ -43,11 +43,19 @@ Use the example matrix test suite to compile/test each directory under
 make validate-examples
 ```
 
+Use the example e2e suite to run live-cluster example validation (kind + CRDs)
+for `main` and all repository tags:
+
+```sh
+make validate-examples-e2e
+```
+
 You can also pass explicit refs:
 
 ```sh
 make validate-refs REFS="main v2.2.0-beta.2 v2.2.0-beta.4"
 make validate-examples REFS="main v2.2.0-beta.2 v2.2.0-beta.4"
+make validate-examples-e2e REFS="main v2.2.0-beta.4"
 ```
 
 ## How to get it

@@ -24,11 +24,19 @@ Install the required CRDs first:
 
 ```sh
 KGW_VERSION=2.1.1
+UPSTREAM_KGW_VERSION="$(go list -m -f '{{.Version}}' github.com/kgateway-dev/kgateway/v2)"
 
-# Enterprise kgateway CRDs (includes EnterpriseKgatewayTrafficPolicy and TrafficPolicy)
+# Enterprise kgateway CRDs
 helm upgrade --install enterprise-kgateway-crds \
   oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway-crds \
   --version "${KGW_VERSION}" \
+  --namespace kgateway-system \
+  --create-namespace
+
+# Upstream kgateway CRDs required for TrafficPolicy
+helm upgrade --install kgateway-crds \
+  oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
+  --version "${UPSTREAM_KGW_VERSION}" \
   --namespace kgateway-system \
   --create-namespace
 
@@ -37,6 +45,10 @@ GW_API_VERSION=v1.4.1
 
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/"${GW_API_VERSION}"/standard-install.yaml
 ```
+
+If `UPSTREAM_KGW_VERSION` resolves to a pseudo-version on an unreleased ref such
+as `main`, use the latest compatible published `kgateway-crds` chart version
+instead.
 
 Then verify the resources used in this example are available:
 
@@ -104,5 +116,6 @@ If you installed CRDs only for this example, remove them with:
 GW_API_VERSION=v1.4.1
 
 helm uninstall enterprise-kgateway-crds -n kgateway-system --ignore-not-found
+helm uninstall kgateway-crds -n kgateway-system --ignore-not-found
 kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/"${GW_API_VERSION}"/standard-install.yaml --ignore-not-found
 ```
