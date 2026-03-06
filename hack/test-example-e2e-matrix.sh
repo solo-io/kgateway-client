@@ -87,6 +87,7 @@ tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/kgateway-example-e2e-tests.XXXXXX")"
 declare -a worktrees=()
 declare -a clusters=()
 declare -a failures=()
+controller_gen_bin="${tmp_dir}/bin/controller-gen"
 
 awk_module_version() {
 	local go_mod="$1"
@@ -97,35 +98,20 @@ awk_module_version() {
 	' "${go_mod}"
 }
 
-resolve_enterprise_chart_version() {
-	local worktree="$1"
-	local ref="$2"
-	local source_tag
-	local merged_tag
-
-	source_tag="$(git -C "${worktree}" log -1 --pretty=%B | sed -n 's/^Source-Tag:[[:space:]]*//p' | head -n 1)"
-	if [[ -n "${source_tag}" ]]; then
-		echo "${source_tag#v}"
-		return 0
-	fi
-
-	if [[ "${ref}" == v* ]]; then
-		echo "${ref#v}"
-		return 0
-	fi
-
-	merged_tag="$(git -C "${worktree}" tag --merged HEAD --sort=-version:refname | head -n 1)"
-	if [[ -n "${merged_tag}" ]]; then
-		echo "${merged_tag#v}"
-		return 0
-	fi
-
-	return 1
-}
-
 is_go_pseudo_version() {
 	local version="$1"
 	[[ "${version}" =~ [0-9]{14}-[0-9a-f]{12}$ ]]
+}
+
+install_controller_gen() {
+	local version="${CONTROLLER_GEN_VERSION:-v0.18.0}"
+
+	if [[ -x "${controller_gen_bin}" ]]; then
+		return 0
+	fi
+
+	mkdir -p "$(dirname "${controller_gen_bin}")"
+	GOBIN="$(dirname "${controller_gen_bin}")" go install "sigs.k8s.io/controller-tools/cmd/controller-gen@${version}"
 }
 
 cleanup() {
@@ -176,8 +162,32 @@ record_failure() {
 	failures+=("${ref}|${stage}|${log}")
 }
 
+generate_enterprise_crds() {
+	local worktree="$1"
+	local output_dir="$2"
+
+	rm -rf "${output_dir}"
+	mkdir -p "${output_dir}"
+
+	(
+		cd "${worktree}"
+		export GOWORK=off
+		"${controller_gen_bin}" \
+			crd \
+			paths=./api/v1alpha1/enterprisekgateway/... \
+			output:crd:dir="${output_dir}"
+	)
+
+	if ! find "${output_dir}" -type f \( -name '*.yaml' -o -name '*.yml' \) | grep -q .; then
+		echo "controller-gen did not produce any enterprise CRD manifests in ${output_dir}" >&2
+		return 1
+	fi
+}
+
 echo "Running e2e example suite (skipping examples/fake-client unit-test example)..."
 printf "%-24s %-36s %-7s %s\n" "REF" "STAGE" "RESULT" "LOG"
+
+install_controller_gen
 
 for ref in "${refs[@]}"; do
 	if ! resolved_ref="$(resolve_ref "${ref}")"; then
@@ -194,21 +204,30 @@ for ref in "${refs[@]}"; do
 	go_mod="${wt}/go.mod"
 	kgw_version_raw="$(awk_module_version "${go_mod}" "github.com/kgateway-dev/kgateway/v2")"
 	gw_api_version="$(awk_module_version "${go_mod}" "sigs.k8s.io/gateway-api")"
-	enterprise_chart_version="$(resolve_enterprise_chart_version "${wt}" "${ref}" || true)"
 	upstream_chart_version="${kgw_version_raw}"
 
 	if is_go_pseudo_version "${upstream_chart_version}"; then
-		upstream_chart_version="v${enterprise_chart_version}"
+		merged_tag="$(git -C "${wt}" tag --merged HEAD --sort=-version:refname | head -n 1)"
+		if [[ -z "${merged_tag}" ]]; then
+			log="${tmp_dir}/${safe_ref}__versions.log"
+			{
+				echo "Failed to resolve a published kgateway chart version for pseudo-version dependency ${kgw_version_raw}."
+				echo "No merged repo tag was available for ref ${ref}."
+			} >"${log}"
+			print_result "${ref}" "resolve-versions" "FAIL" "${log}"
+			record_failure "${ref}" "resolve-versions" "${log}"
+			continue
+		fi
+		upstream_chart_version="${merged_tag}"
 	fi
 
-	if [[ -z "${kgw_version_raw}" || -z "${gw_api_version}" || -z "${enterprise_chart_version}" || -z "${upstream_chart_version}" ]]; then
+	if [[ -z "${kgw_version_raw}" || -z "${gw_api_version}" || -z "${upstream_chart_version}" ]]; then
 		log="${tmp_dir}/${safe_ref}__versions.log"
 		{
 			echo "Failed to resolve required module versions from ${go_mod}."
 			echo "github.com/kgateway-dev/kgateway/v2=${kgw_version_raw:-<empty>}"
 			echo "upstream chart version=${upstream_chart_version:-<empty>}"
 			echo "sigs.k8s.io/gateway-api=${gw_api_version:-<empty>}"
-			echo "enterprise chart version=${enterprise_chart_version:-<empty>}"
 		} >"${log}"
 		print_result "${ref}" "resolve-versions" "FAIL" "${log}"
 		record_failure "${ref}" "resolve-versions" "${log}"
@@ -236,14 +255,17 @@ for ref in "${refs[@]}"; do
 	fi
 
 	kind get kubeconfig --name "${cluster_name}" >"${kubeconfig_path}"
+	enterprise_crd_dir="${tmp_dir}/${safe_ref}__enterprise-crds"
 
 	log="${tmp_dir}/${safe_ref}__install-crds.log"
 	if (
 		set -euo pipefail
 		echo "Pinned upstream kgateway module version: ${kgw_version_raw}"
 		echo "Using upstream kgateway CRD chart version: ${upstream_chart_version}"
-		echo "Using enterprise CRD chart version: ${enterprise_chart_version}"
+		echo "Generating enterprise CRDs from checked-out API types in ${wt}"
 		echo "Using Gateway API version: ${gw_api_version}"
+
+		generate_enterprise_crds "${wt}" "${enterprise_crd_dir}"
 
 		helm upgrade --install kgateway-crds \
 			oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
@@ -252,12 +274,7 @@ for ref in "${refs[@]}"; do
 			--create-namespace \
 			--kubeconfig "${kubeconfig_path}"
 
-		helm upgrade --install enterprise-kgateway-crds \
-			oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway-crds \
-			--version "${enterprise_chart_version}" \
-			--namespace kgateway-system \
-			--create-namespace \
-			--kubeconfig "${kubeconfig_path}"
+		KUBECONFIG="${kubeconfig_path}" kubectl apply -f "${enterprise_crd_dir}"
 
 		KUBECONFIG="${kubeconfig_path}" kubectl apply --server-side -f \
 			"https://github.com/kubernetes-sigs/gateway-api/releases/download/${gw_api_version}/standard-install.yaml"

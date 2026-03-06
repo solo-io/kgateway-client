@@ -49,8 +49,9 @@ The job installs `kubectl`, `helm`, and `kind`, then runs:
 
 - `./hack/test-example-e2e-matrix.sh`
 
-That script creates a kind cluster per ref, installs the required CRDs, skips
-`examples/fake-client`, and runs the live examples.
+That script creates a kind cluster per ref, installs the upstream `kgateway`
+and Gateway API CRDs, generates the enterprise CRD manifests from the checked
+out ref's API types, skips `examples/fake-client`, and runs the live examples.
 
 ## Sync workflows
 
