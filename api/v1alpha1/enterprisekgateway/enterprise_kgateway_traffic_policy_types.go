@@ -130,7 +130,7 @@ type EntWAF struct {
 
 	// WAFServerRef is a reference to the external processing gRPC service that will be used to process requests
 	// when WAF is enabled.
-	// If not set, defaults to the extproc service named 'waf-extproc' in the same namespace as
+	// If not set, defaults to the extproc service named 'waf-server' in the same namespace as
 	// the Solo Enterprise for kgateway control plane.
 	// +optional
 	WAFServerRef *gwv1.BackendObjectReference `json:"wafServerRef,omitempty"`
