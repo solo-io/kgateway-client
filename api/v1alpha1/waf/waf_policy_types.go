@@ -55,34 +55,33 @@ type WAFPolicySpec struct {
 }
 
 // DirectiveSource is a set of directives (e.g. rules or settings) to provide to the WAF engine.
-// +kubebuilder:validation:ExactlyOneOf=inline
+// +kubebuilder:validation:ExactlyOneOf=inline;configMap
 type DirectiveSource struct {
 	// Inline specifies custom directives as an inline string.
 	// +optional
 	Inline *string `json:"inline,omitempty"`
 
 	// ConfigMap is a reference to a ConfigMap containing custom directives.
-	// This is not currently implemented.
 	// +optional
-	// ConfigMap *ConfigMapRef `json:"configMap,omitempty"`
+	ConfigMap *ConfigMapRef `json:"configMap,omitempty"`
 }
 
 // ConfigMapRef contains a reference to a ConfigMap, and optionally specific keys within the ConfigMap.
-// type ConfigMapRef struct {
-// 	// Name is the name of the ConfigMap.
-// 	// +required
-// 	Name string `json:"name"`
-//
-// 	// Namespace is the namespace of the ConfigMap.
-// 	// +required
-// 	Namespace string `json:"namespace"`
-//
-// 	// Keys is a list of keys to use from the ConfigMap.
-// 	// If not set, all keys in the ConfigMap are used.
-// 	// +optional
-// 	// +kubebuilder:validation:MinItems=1
-// 	Keys []string `json:"keys,omitempty"`
-// }
+type ConfigMapRef struct {
+	// Name is the name of the ConfigMap.
+	// +required
+	Name string `json:"name"`
+
+	// Namespace is the namespace of the ConfigMap.
+	// +required
+	Namespace string `json:"namespace"`
+
+	// Keys is a list of keys to use from the ConfigMap.
+	// If not set, all keys in the ConfigMap are used.
+	// +optional
+	// +kubebuilder:validation:MinItems=1
+	Keys []string `json:"keys,omitempty"`
+}
 
 // CoreRuleSet specifies custom settings for the OWASP CoreRuleSet.
 type CoreRuleSet struct {
