@@ -122,18 +122,18 @@ type EntExtAuth struct {
 }
 
 // +kubebuilder:validation:ExactlyOneOf=wafPolicyRef;disable
-// +kubebuilder:validation:AtMostOneOf=wafServerRef;disable
+// +kubebuilder:validation:AtMostOneOf=wafServer;disable
 type EntWAF struct {
 	// WAFPolicyRef references the WAFPolicy we want to use for the traffic policy
 	// +optional
 	WAFPolicyRef *shared.WAFPolicyRef `json:"wafPolicyRef,omitempty"`
 
-	// WAFServerRef is a reference to the external processing gRPC service that will be used to process requests
+	// WAFServer is a reference to the external processing gRPC service that will be used to process requests
 	// when WAF is enabled.
-	// If not set, defaults to the extproc service named 'waf-server' in the same namespace as
+	// If not set, defaults to the extproc service named 'waf-extproc' in the same namespace as
 	// the Solo Enterprise for kgateway control plane.
 	// +optional
-	WAFServerRef *gwv1.BackendObjectReference `json:"wafServerRef,omitempty"`
+	WAFServer *gwv1.BackendObjectReference `json:"wafServer,omitempty"`
 
 	// Disable WAF.
 	// Can be used to disable WAF policies applied at a higher level in the config hierarchy.

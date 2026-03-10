@@ -131,10 +131,6 @@ type Extensions struct {
 	RateLimiter *DeploymentConfiguration `json:"ratelimiter,omitempty"`
 	// +optional
 	ExtCache *DeploymentConfiguration `json:"extCache,omitempty"`
-
-	// WAF configures the WAF server.
-	// +optional
-	WAF *WAFConfiguration `json:"waf,omitempty"`
 }
 
 // DeploymentConfiguration configures the Kubernetes Deployment.
@@ -230,22 +226,3 @@ type ContainerConfiguration struct {
 	// +optional
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 }
-
-type WAFConfiguration struct {
-	DeploymentConfiguration `json:",inline"`
-
-	// LogLevel is the log level for the WAF extproc server. If not set, defaults to "info".
-	// +kubebuilder:validation:Enum=error;warn;info;debug;trace
-	// +optional
-	LogLevel *WAFLogLevel `json:"logLevel,omitempty"`
-}
-
-type WAFLogLevel string
-
-const (
-	WAFLogLevelError WAFLogLevel = "error"
-	WAFLogLevelWarn  WAFLogLevel = "warn"
-	WAFLogLevelInfo  WAFLogLevel = "info"
-	WAFLogLevelDebug WAFLogLevel = "debug"
-	WAFLogLevelTrace WAFLogLevel = "trace"
-)
