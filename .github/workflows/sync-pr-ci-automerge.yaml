@@ -97,8 +97,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.head.ref == 'sync/gloo-gateway-clientset' &&
       !github.event.pull_request.draft &&
-      needs.merge-sync-pr.result != 'success' &&
-      secrets.SLACK_WEBHOOK_URL != ''
+      needs.merge-sync-pr.result != 'success'
     needs:
       - merge-sync-pr
     runs-on: ubuntu-22.04
@@ -116,6 +115,10 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
         run: |
+          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
+            echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
+            exit 0
+          fi
           mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
           export SLACK_MESSAGE="${mention} main sync PR #${PR_NUMBER} did not auto-merge.
 

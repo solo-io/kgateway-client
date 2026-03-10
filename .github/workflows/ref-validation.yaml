@@ -133,8 +133,7 @@ jobs:
       always() &&
       github.event_name == 'workflow_dispatch' &&
       startsWith(inputs.refs, 'v') &&
-      (needs.validate.result == 'failure' || needs.validate-examples.result == 'failure') &&
-      secrets.SLACK_WEBHOOK_URL != ''
+      (needs.validate.result == 'failure' || needs.validate-examples.result == 'failure')
     needs:
       - validate
       - validate-examples
@@ -153,6 +152,10 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
         run: |
+          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
+            echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
+            exit 0
+          fi
           mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
           export SLACK_MESSAGE="${mention} tag sync validation failed for ${TAG_REF}.
 

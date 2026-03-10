@@ -95,8 +95,7 @@ jobs:
   notify-tag-sync-failure:
     if: >-
       always() &&
-      needs.create-release-tag.result == 'failure' &&
-      secrets.SLACK_WEBHOOK_URL != ''
+      needs.create-release-tag.result == 'failure'
     needs:
       - create-release-tag
     runs-on: ubuntu-22.04
@@ -112,6 +111,10 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
         run: |
+          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
+            echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
+            exit 0
+          fi
           mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
           export SLACK_MESSAGE="${mention} tag sync workflow failed for ${BRANCH_REF}.
 
