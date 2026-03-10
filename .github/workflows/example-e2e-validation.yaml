@@ -7,18 +7,15 @@ on:
   push:
     branches:
       - main
-      - sync/tag-*
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       refs:
-        description: "Space-separated refs to test (default: main and all tags; pull_request and sync/tag pushes run only the triggering ref)"
+        description: "Space-separated refs to test (default: main; pull_request runs only the PR head)"
         required: false
         type: string
 
 concurrency:
-  group: example-e2e-validation-${{ github.ref }}
+  group: example-e2e-validation-${{ github.event_name == 'workflow_dispatch' && inputs.refs || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -66,14 +63,12 @@ jobs:
             if [[ -n "${{ inputs.refs }}" ]]; then
               echo "refs=${{ inputs.refs }}" >> "$GITHUB_OUTPUT"
             else
-              echo "refs=" >> "$GITHUB_OUTPUT"
+              echo "refs=main" >> "$GITHUB_OUTPUT"
             fi
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "refs=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == sync/tag-* ]]; then
-            echo "refs=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
-            echo "refs=" >> "$GITHUB_OUTPUT"
+            echo "refs=main" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run example e2e validation suite
@@ -87,3 +82,33 @@ jobs:
           else
             ./hack/test-example-e2e-matrix.sh
           fi
+
+  notify-tag-e2e-failure:
+    if: >-
+      always() &&
+      github.event_name == 'workflow_dispatch' &&
+      startsWith(inputs.refs, 'v') &&
+      needs.validate-examples-e2e.result == 'failure' &&
+      secrets.SLACK_WEBHOOK_URL != ''
+    needs:
+      - validate-examples-e2e
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v4
+
+      - name: Notify Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_NOTIFY_MENTION: ${{ vars.SLACK_NOTIFY_MENTION }}
+          TAG_REF: ${{ inputs.refs }}
+          E2E_RESULT: ${{ needs.validate-examples-e2e.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
+          export SLACK_MESSAGE="${mention} tag sync e2e validation failed for ${TAG_REF}.
+
+          validate-examples-e2e=${E2E_RESULT}
+          Run: ${RUN_URL}"
+          ./hack/send-slack-notification.sh

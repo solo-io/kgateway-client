@@ -31,6 +31,8 @@ prefix, for example `v2.2.0-beta.4`.
 - This repo's `sync-source-tag-to-release-tag.yaml` workflow reads that
   metadata from the pushed `sync/tag-*` commit and creates the matching tag in
   `kgateway-client`.
+- After creating or retargeting the tag, that workflow explicitly dispatches
+  the validation workflows using the created tag as the ref.
 - The tag is created from the pushed tag-branch commit in this repository, not
   from a commit in the source repository.
 - If the source metadata does not include a leading `v`, the workflow adds it
