@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - sync/tag-*
     tags:
       - "v*"
   workflow_dispatch:
@@ -64,6 +65,8 @@ jobs:
             fi
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
             echo "refs=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == sync/tag-* ]]; then
+            echo "refs=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "refs=main" >> "$GITHUB_OUTPUT"
           fi
@@ -118,6 +121,8 @@ jobs:
             echo "refs=" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
             echo "refs=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == sync/tag-* ]]; then
+            echo "refs=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "refs=main" >> "$GITHUB_OUTPUT"
           fi

@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       refs:
-        description: "Space-separated refs to test (default: main and all tags; pull_request runs only PR head)"
+        description: "Space-separated refs to test (default: main and all tags; pull_request and sync/tag pushes run only the triggering ref)"
         required: false
         type: string
 
@@ -70,6 +70,8 @@ jobs:
             fi
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "refs=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == sync/tag-* ]]; then
+            echo "refs=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "refs=" >> "$GITHUB_OUTPUT"
           fi

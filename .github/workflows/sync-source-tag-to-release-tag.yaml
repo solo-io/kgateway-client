@@ -3,7 +3,7 @@ name: sync source tag to release tag
 on:
   push:
     branches:
-      - main
+      - sync/tag-*
 
 jobs:
   create-release-tag:
@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Resolve Source-Tag from merge commit metadata
+      - name: Resolve Source-Tag from pushed commit metadata
         id: source_tag
         shell: bash
         run: |
@@ -30,15 +30,22 @@ jobs:
           fi
 
           if [[ -z "${SOURCE_TAG}" ]]; then
-            echo "No Source-Tag metadata found on ${GITHUB_SHA}; skipping tag sync"
-            echo "target_tag=" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::error::No Source-Tag metadata found on ${GITHUB_SHA}"
+            exit 1
+          fi
+
+          BRANCH_TAG="${GITHUB_REF_NAME#sync/tag-}"
+          NORMALIZED_SOURCE_TAG="${SOURCE_TAG#v}"
+
+          if [[ "${BRANCH_TAG#v}" != "${NORMALIZED_SOURCE_TAG}" ]]; then
+            echo "::error::Source-Tag ${SOURCE_TAG} does not match branch ${GITHUB_REF_NAME}"
+            exit 1
           fi
 
           if [[ "${SOURCE_TAG}" == v* ]]; then
             TARGET_TAG="${SOURCE_TAG}"
           else
-            TARGET_TAG="v${SOURCE_TAG}"
+            TARGET_TAG="v${NORMALIZED_SOURCE_TAG}"
           fi
 
           echo "source_tag=${SOURCE_TAG}" >> "$GITHUB_OUTPUT"
