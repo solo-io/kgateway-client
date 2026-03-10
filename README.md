@@ -26,18 +26,22 @@ prefix, for example `v2.2.0-beta.4`.
 
 - The source sync workflow in `solo-io/gloo-gateway` includes `Source-Tag`
   metadata when a source release tag is being propagated.
-- After the sync PR merges to `main`, this repo's
-  `sync-source-tag-to-release-tag.yaml` workflow reads that metadata and creates
-  the matching tag in `kgateway-client`.
-- The tag is created from the merge commit in this repository, not from a
-  commit in the source repository.
+- Source tag syncs are pushed to per-tag branches such as
+  `sync/tag-2.2.0-beta.10`.
+- This repo's `sync-source-tag-to-release-tag.yaml` workflow reads that
+  metadata from the pushed `sync/tag-*` commit and creates the matching tag in
+  `kgateway-client`.
+- The tag is created from the pushed tag-branch commit in this repository, not
+  from a commit in the source repository.
 - If the source metadata does not include a leading `v`, the workflow adds it
   so published tags follow normal Go module tagging conventions.
 - If a corrected sync for the same source tag is merged later, the workflow can
-  retarget the existing tag to the newer merge commit.
+  retarget the existing tag to the newer tag-branch commit.
 - The `sync/gloo-gateway-clientset` branch is a long-lived automation branch
   used to open or update sync PRs against `main`; it is intentionally reused
   across sync runs and is not auto-deleted after merges.
+- `sync/tag-*` branches are per-tag automation branches used for validation and
+  tag publication; they are not merged into `main`.
 
 This means `main` can move ahead of the most recent published tag, while tags
 identify specific synced release points that are safe to consume from Go.

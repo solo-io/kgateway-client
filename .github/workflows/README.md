@@ -15,6 +15,8 @@ Runs the lightweight validation suite.
   - `validate-examples` runs the default example compile/test matrix (`main` and all tags)
 - On `push` to `main`:
   - validates `main`
+- On `push` to `sync/tag-*`:
+  - validates only the pushed branch commit
 - On `push` to `v*` tags:
   - validates only the pushed tag
 - On `workflow_dispatch`:
@@ -38,7 +40,7 @@ Runs the live-cluster example e2e suite.
 - On `push` to `main`:
   - tests `main` and all tags
 - On `push` to `sync/tag-*`:
-  - tests `main` and all tags
+  - tests only the pushed branch commit
 - On `push` to `v*` tags:
   - tests `main` and all tags
 - On `workflow_dispatch`:
@@ -86,22 +88,26 @@ trusted sync PRs.
 
 ### `sync-source-tag-to-release-tag.yaml`
 
-Creates or retargets repo tags after sync PRs merge to `main`.
+Creates or retargets repo tags from pushed `sync/tag-*` branches.
 
-- Runs on `push` to `main`
-- Reads `Source-Tag:` metadata from the merge commit message/body
+- Runs on `push` to `sync/tag-*`
+- Reads `Source-Tag:` metadata from the pushed commit message/body
+- Verifies that the `Source-Tag` matches the pushed branch name
 - Creates a matching target tag
 - Adds a leading `v` when the source tag does not already include it
 - Retargets an existing tag if the tag already exists and points at a different
   commit
 
 This workflow is paired with the source repo sync workflow, which includes
-`Source-Tag` metadata in sync PR commits when a source tag is being propagated.
+`Source-Tag` metadata in sync tag branch commits when a source tag is being
+propagated.
 
 ## Notes
 
 - The fixed sync branch is `sync/gloo-gateway-clientset`.
 - The branch is intentionally reused across sync runs and is not auto-deleted on
   merge.
+- Per-tag sync branches follow the `sync/tag-*` pattern, are validated on push,
+  and are not auto-merged to `main`.
 - The validation and e2e workflows are independent of the source sync workflow;
   they only define the checks and post-merge behavior in this repo.
