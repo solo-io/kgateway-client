@@ -7,18 +7,15 @@ on:
   push:
     branches:
       - main
-      - sync/tag-*
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       refs:
-        description: "Space-separated refs to test (default: main and all tags)"
+        description: "Space-separated refs to test (default: main)"
         required: false
         type: string
 
 concurrency:
-  group: ref-validation-${{ github.ref }}
+  group: ref-validation-${{ github.event_name == 'workflow_dispatch' && inputs.refs || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -54,7 +51,7 @@ jobs:
             if [[ -n "${{ inputs.refs }}" ]]; then
               echo "refs=${{ inputs.refs }}" >> "$GITHUB_OUTPUT"
             else
-              echo "refs=" >> "$GITHUB_OUTPUT"
+              echo "refs=main" >> "$GITHUB_OUTPUT"
             fi
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             latest_tag="$(git for-each-ref --sort=-version:refname --format='%(refname:short)' refs/tags | head -n 1)"
@@ -63,10 +60,6 @@ jobs:
             else
               echo "refs=main" >> "$GITHUB_OUTPUT"
             fi
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
-            echo "refs=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == sync/tag-* ]]; then
-            echo "refs=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "refs=main" >> "$GITHUB_OUTPUT"
           fi
@@ -115,14 +108,10 @@ jobs:
             if [[ -n "${{ inputs.refs }}" ]]; then
               echo "refs=${{ inputs.refs }}" >> "$GITHUB_OUTPUT"
             else
-              echo "refs=" >> "$GITHUB_OUTPUT"
+              echo "refs=main" >> "$GITHUB_OUTPUT"
             fi
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "refs=" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
-            echo "refs=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == sync/tag-* ]]; then
-            echo "refs=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "refs=main" >> "$GITHUB_OUTPUT"
           fi

@@ -7,18 +7,15 @@ on:
   push:
     branches:
       - main
-      - sync/tag-*
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       refs:
-        description: "Space-separated refs to test (default: main and all tags; pull_request and sync/tag pushes run only the triggering ref)"
+        description: "Space-separated refs to test (default: main; pull_request runs only the PR head)"
         required: false
         type: string
 
 concurrency:
-  group: example-e2e-validation-${{ github.ref }}
+  group: example-e2e-validation-${{ github.event_name == 'workflow_dispatch' && inputs.refs || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -66,14 +63,12 @@ jobs:
             if [[ -n "${{ inputs.refs }}" ]]; then
               echo "refs=${{ inputs.refs }}" >> "$GITHUB_OUTPUT"
             else
-              echo "refs=" >> "$GITHUB_OUTPUT"
+              echo "refs=main" >> "$GITHUB_OUTPUT"
             fi
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "refs=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == sync/tag-* ]]; then
-            echo "refs=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
-            echo "refs=" >> "$GITHUB_OUTPUT"
+            echo "refs=main" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run example e2e validation suite

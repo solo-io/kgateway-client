@@ -9,6 +9,7 @@ jobs:
   create-release-tag:
     runs-on: ubuntu-22.04
     permissions:
+      actions: write
       contents: write
     steps:
       - name: Checkout repository
@@ -79,3 +80,14 @@ jobs:
           git tag "${TARGET_TAG}" "${GITHUB_SHA}"
           git push origin "refs/tags/${TARGET_TAG}"
           echo "Created ${TARGET_TAG} from Source-Tag ${SOURCE_TAG} at ${GITHUB_SHA}"
+
+      - name: Dispatch validation workflows for target tag
+        if: steps.source_tag.outputs.target_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          VALIDATION_REF: ${{ steps.source_tag.outputs.target_tag }}
+          WORKFLOW_REF: main
+        shell: bash
+        run: |
+          ./hack/dispatch-validation-workflows.sh
