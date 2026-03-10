@@ -11,8 +11,8 @@ This directory contains the GitHub Actions workflows used to validate
 Runs the lightweight validation suite.
 
 - On `pull_request` to `main`:
-  - `validate` tests the latest repo tag if one exists, otherwise `main`
-  - `validate-examples` runs the default example compile/test matrix (`main` and all tags)
+  - `validate` tests only the PR head SHA
+  - `validate-examples` tests only the PR head SHA
 - On `push` to `main`:
   - validates `main`
 - On `workflow_dispatch`:
