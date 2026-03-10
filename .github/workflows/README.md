@@ -75,17 +75,12 @@ Validates and merges trusted sync PRs opened against `main`.
   - merges the PR directly as the sync app with administrator privileges so the
     configured ruleset bypass applies
   - leaves the sync branch in place with `--delete-branch=false`
-- `notify-sync-pr-failure`
-  - runs on `pull_request_target`
-  - notifies Slack when a sync PR targeting `main` does not auto-merge
 
 Required repo configuration:
 
 - Variable: `SYNC_APP_ID`
 - Variable: `SYNC_PR_AUTHOR_LOGIN`
-- Variable: `SLACK_NOTIFY_MENTION` (optional; defaults to `@Daneyon Hansen`)
 - Secret: `SYNC_APP_PRIVATE_KEY`
-- Secret: `SLACK_WEBHOOK_URL` (for failure notifications)
 
 The sync app must also have the permissions and ruleset bypass needed to merge
 trusted sync PRs.
@@ -103,7 +98,6 @@ Creates or retargets repo tags from pushed `sync/tag-*` branches.
   commit
 - Explicitly dispatches `ref-validation.yaml` and
   `example-e2e-validation.yaml` with `refs=<created tag>`
-- Notifies Slack if tag publication or validation dispatch fails
 
 This workflow is paired with the source repo sync workflow, which includes
 `Source-Tag` metadata in sync tag branch commits when a source tag is being

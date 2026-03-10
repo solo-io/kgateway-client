@@ -82,36 +82,3 @@ jobs:
           else
             ./hack/test-example-e2e-matrix.sh
           fi
-
-  notify-tag-e2e-failure:
-    if: >-
-      always() &&
-      github.event_name == 'workflow_dispatch' &&
-      startsWith(inputs.refs, 'v') &&
-      needs.validate-examples-e2e.result == 'failure'
-    needs:
-      - validate-examples-e2e
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout workflow repository
-        uses: actions/checkout@v4
-
-      - name: Notify Slack
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_NOTIFY_MENTION: ${{ vars.SLACK_NOTIFY_MENTION }}
-          TAG_REF: ${{ inputs.refs }}
-          E2E_RESULT: ${{ needs.validate-examples-e2e.result }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        shell: bash
-        run: |
-          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
-            echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
-            exit 0
-          fi
-          mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
-          export SLACK_MESSAGE="${mention} tag sync e2e validation failed for ${TAG_REF}.
-
-          validate-examples-e2e=${E2E_RESULT}
-          Run: ${RUN_URL}"
-          ./hack/send-slack-notification.sh

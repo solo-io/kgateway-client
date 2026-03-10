@@ -127,39 +127,3 @@ jobs:
           else
             ./hack/test-example-matrix.sh
           fi
-
-  notify-tag-validation-failure:
-    if: >-
-      always() &&
-      github.event_name == 'workflow_dispatch' &&
-      startsWith(inputs.refs, 'v') &&
-      (needs.validate.result == 'failure' || needs.validate-examples.result == 'failure')
-    needs:
-      - validate
-      - validate-examples
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout workflow repository
-        uses: actions/checkout@v4
-
-      - name: Notify Slack
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_NOTIFY_MENTION: ${{ vars.SLACK_NOTIFY_MENTION }}
-          TAG_REF: ${{ inputs.refs }}
-          VALIDATE_RESULT: ${{ needs.validate.result }}
-          VALIDATE_EXAMPLES_RESULT: ${{ needs.validate-examples.result }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        shell: bash
-        run: |
-          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
-            echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
-            exit 0
-          fi
-          mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
-          export SLACK_MESSAGE="${mention} tag sync validation failed for ${TAG_REF}.
-
-          validate=${VALIDATE_RESULT}
-          validate-examples=${VALIDATE_EXAMPLES_RESULT}
-          Run: ${RUN_URL}"
-          ./hack/send-slack-notification.sh
