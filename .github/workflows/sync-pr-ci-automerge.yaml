@@ -88,3 +88,41 @@ jobs:
         shell: bash
         run: |
           ./hack/merge-sync-pr.sh
+
+  notify-sync-pr-failure:
+    if: >-
+      always() &&
+      github.event_name == 'pull_request_target' &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'sync/gloo-gateway-clientset' &&
+      !github.event.pull_request.draft &&
+      needs.merge-sync-pr.result != 'success'
+    needs:
+      - merge-sync-pr
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v4
+
+      - name: Notify Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_NOTIFY_MENTION: ${{ vars.SLACK_NOTIFY_MENTION }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          MERGE_RESULT: ${{ needs.merge-sync-pr.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          if [[ -z "${SLACK_WEBHOOK_URL}" ]]; then
+            echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
+            exit 0
+          fi
+          mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
+          export SLACK_MESSAGE="${mention} main sync PR #${PR_NUMBER} did not auto-merge.
+
+          merge-sync-pr=${MERGE_RESULT}
+          PR: ${PR_URL}
+          Run: ${RUN_URL}"
+          ./hack/send-slack-notification.sh
