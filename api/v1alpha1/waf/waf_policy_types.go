@@ -77,7 +77,7 @@ type ConfigMapRef struct {
 	Namespace string `json:"namespace"`
 
 	// Keys is a list of keys to use from the ConfigMap.
-	// If not set, the values of all keys in the ConfigMap will be used, in alphabetical order by key.
+	// If not set, the values of all keys in the ConfigMap will be used, in lexicographic order by key.
 	// +optional
 	// +kubebuilder:validation:MinItems=1
 	Keys []string `json:"keys,omitempty"`
