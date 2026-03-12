@@ -18,22 +18,22 @@ limitations under the License.
 package fake
 
 import (
-	enterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisesolo"
+	enterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/enterprisesolo/versioned/typed/v1alpha1/enterprisesolo"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeEnterprisekgatewayEnterprisesolo struct {
+type FakeEnterpriseEnterprisesolo struct {
 	*testing.Fake
 }
 
-func (c *FakeEnterprisekgatewayEnterprisesolo) EnterpriseListenerSets(namespace string) enterprisesolo.EnterpriseListenerSetInterface {
+func (c *FakeEnterpriseEnterprisesolo) EnterpriseListenerSets(namespace string) enterprisesolo.EnterpriseListenerSetInterface {
 	return newFakeEnterpriseListenerSets(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeEnterprisekgatewayEnterprisesolo) RESTClient() rest.Interface {
+func (c *FakeEnterpriseEnterprisesolo) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }
