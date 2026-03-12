@@ -21,28 +21,28 @@ import (
 	http "net/http"
 
 	v1alpha1enterprisesolo "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisesolo"
-	scheme "github.com/solo-io/kgateway-client/v2/clientset/enterprisesolo/versioned/scheme"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 
-type EnterpriseEnterprisesoloInterface interface {
+type EnterprisekgatewayEnterprisesoloInterface interface {
 	RESTClient() rest.Interface
 	EnterpriseListenerSetsGetter
 }
 
-// EnterpriseEnterprisesoloClient is used to interact with features provided by the enterprise.solo.io group.
-type EnterpriseEnterprisesoloClient struct {
+// EnterprisekgatewayEnterprisesoloClient is used to interact with features provided by the enterprise.solo.io group.
+type EnterprisekgatewayEnterprisesoloClient struct {
 	restClient rest.Interface
 }
 
-func (c *EnterpriseEnterprisesoloClient) EnterpriseListenerSets(namespace string) EnterpriseListenerSetInterface {
+func (c *EnterprisekgatewayEnterprisesoloClient) EnterpriseListenerSets(namespace string) EnterpriseListenerSetInterface {
 	return newEnterpriseListenerSets(c, namespace)
 }
 
-// NewForConfig creates a new EnterpriseEnterprisesoloClient for the given config.
+// NewForConfig creates a new EnterprisekgatewayEnterprisesoloClient for the given config.
 // NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
 // where httpClient was generated with rest.HTTPClientFor(c).
-func NewForConfig(c *rest.Config) (*EnterpriseEnterprisesoloClient, error) {
+func NewForConfig(c *rest.Config) (*EnterprisekgatewayEnterprisesoloClient, error) {
 	config := *c
 	setConfigDefaults(&config)
 	httpClient, err := rest.HTTPClientFor(&config)
@@ -52,21 +52,21 @@ func NewForConfig(c *rest.Config) (*EnterpriseEnterprisesoloClient, error) {
 	return NewForConfigAndClient(&config, httpClient)
 }
 
-// NewForConfigAndClient creates a new EnterpriseEnterprisesoloClient for the given config and http client.
+// NewForConfigAndClient creates a new EnterprisekgatewayEnterprisesoloClient for the given config and http client.
 // Note the http client provided takes precedence over the configured transport values.
-func NewForConfigAndClient(c *rest.Config, h *http.Client) (*EnterpriseEnterprisesoloClient, error) {
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*EnterprisekgatewayEnterprisesoloClient, error) {
 	config := *c
 	setConfigDefaults(&config)
 	client, err := rest.RESTClientForConfigAndClient(&config, h)
 	if err != nil {
 		return nil, err
 	}
-	return &EnterpriseEnterprisesoloClient{client}, nil
+	return &EnterprisekgatewayEnterprisesoloClient{client}, nil
 }
 
-// NewForConfigOrDie creates a new EnterpriseEnterprisesoloClient for the given config and
+// NewForConfigOrDie creates a new EnterprisekgatewayEnterprisesoloClient for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *EnterpriseEnterprisesoloClient {
+func NewForConfigOrDie(c *rest.Config) *EnterprisekgatewayEnterprisesoloClient {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -74,9 +74,9 @@ func NewForConfigOrDie(c *rest.Config) *EnterpriseEnterprisesoloClient {
 	return client
 }
 
-// New creates a new EnterpriseEnterprisesoloClient for the given RESTClient.
-func New(c rest.Interface) *EnterpriseEnterprisesoloClient {
-	return &EnterpriseEnterprisesoloClient{c}
+// New creates a new EnterprisekgatewayEnterprisesoloClient for the given RESTClient.
+func New(c rest.Interface) *EnterprisekgatewayEnterprisesoloClient {
+	return &EnterprisekgatewayEnterprisesoloClient{c}
 }
 
 func setConfigDefaults(config *rest.Config) {
@@ -92,7 +92,7 @@ func setConfigDefaults(config *rest.Config) {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *EnterpriseEnterprisesoloClient) RESTClient() rest.Interface {
+func (c *EnterprisekgatewayEnterprisesoloClient) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}
