@@ -21,7 +21,7 @@ import (
 	context "context"
 
 	v1alpha1enterprisesolo "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisesolo"
-	scheme "github.com/solo-io/kgateway-client/v2/clientset/enterprisesolo/versioned/scheme"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -55,7 +55,7 @@ type enterpriseListenerSets struct {
 }
 
 // newEnterpriseListenerSets returns a EnterpriseListenerSets
-func newEnterpriseListenerSets(c *EnterpriseEnterprisesoloClient, namespace string) *enterpriseListenerSets {
+func newEnterpriseListenerSets(c *EnterprisekgatewayEnterprisesoloClient, namespace string) *enterpriseListenerSets {
 	return &enterpriseListenerSets{
 		gentype.NewClientWithList[*v1alpha1enterprisesolo.EnterpriseListenerSet, *v1alpha1enterprisesolo.EnterpriseListenerSetList](
 			"enterpriselistenersets",

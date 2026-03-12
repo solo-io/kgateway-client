@@ -19,17 +19,17 @@ package fake
 
 import (
 	enterprisesolo "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisesolo"
-	v1alpha1enterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/enterprisesolo/versioned/typed/v1alpha1/enterprisesolo"
+	v1alpha1enterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisesolo"
 	gentype "k8s.io/client-go/gentype"
 )
 
 // fakeEnterpriseListenerSets implements EnterpriseListenerSetInterface
 type fakeEnterpriseListenerSets struct {
 	*gentype.FakeClientWithList[*enterprisesolo.EnterpriseListenerSet, *enterprisesolo.EnterpriseListenerSetList]
-	Fake *FakeEnterpriseEnterprisesolo
+	Fake *FakeEnterprisekgatewayEnterprisesolo
 }
 
-func newFakeEnterpriseListenerSets(fake *FakeEnterpriseEnterprisesolo, namespace string) v1alpha1enterprisesolo.EnterpriseListenerSetInterface {
+func newFakeEnterpriseListenerSets(fake *FakeEnterprisekgatewayEnterprisesolo, namespace string) v1alpha1enterprisesolo.EnterpriseListenerSetInterface {
 	return &fakeEnterpriseListenerSets{
 		gentype.NewFakeClientWithList[*enterprisesolo.EnterpriseListenerSet, *enterprisesolo.EnterpriseListenerSetList](
 			fake.Fake,
