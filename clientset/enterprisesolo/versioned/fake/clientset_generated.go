@@ -18,15 +18,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/solo-io/kgateway-client/v2/clientset/versioned"
-	extauthv1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/extauth.solo.io/v1"
-	fakeextauthv1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/extauth.solo.io/v1/fake"
-	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/ratelimit.solo.io/v1alpha1"
-	fakeratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/ratelimit.solo.io/v1alpha1/fake"
-	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisekgateway"
-	fakeenterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/enterprisekgateway/fake"
-	enterprisekgatewaywaf "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/waf"
-	fakeenterprisekgatewaywaf "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/waf/fake"
+	clientset "github.com/solo-io/kgateway-client/v2/clientset/enterprisesolo/versioned"
+	enterpriseenterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/enterprisesolo/versioned/typed/v1alpha1/enterprisesolo"
+	fakeenterpriseenterprisesolo "github.com/solo-io/kgateway-client/v2/clientset/enterprisesolo/versioned/typed/v1alpha1/enterprisesolo/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -93,22 +87,7 @@ var (
 	_ testing.FakeClient  = &Clientset{}
 )
 
-// ExtauthV1 retrieves the ExtauthV1Client
-func (c *Clientset) ExtauthV1() extauthv1.ExtauthV1Interface {
-	return &fakeextauthv1.FakeExtauthV1{Fake: &c.Fake}
-}
-
-// RatelimitV1alpha1 retrieves the RatelimitV1alpha1Client
-func (c *Clientset) RatelimitV1alpha1() ratelimitv1alpha1.RatelimitV1alpha1Interface {
-	return &fakeratelimitv1alpha1.FakeRatelimitV1alpha1{Fake: &c.Fake}
-}
-
-// EnterprisekgatewayEnterprisekgateway retrieves the EnterprisekgatewayEnterprisekgatewayClient
-func (c *Clientset) EnterprisekgatewayEnterprisekgateway() enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayInterface {
-	return &fakeenterprisekgatewayenterprisekgateway.FakeEnterprisekgatewayEnterprisekgateway{Fake: &c.Fake}
-}
-
-// EnterprisekgatewayWaf retrieves the EnterprisekgatewayWafClient
-func (c *Clientset) EnterprisekgatewayWaf() enterprisekgatewaywaf.EnterprisekgatewayWafInterface {
-	return &fakeenterprisekgatewaywaf.FakeEnterprisekgatewayWaf{Fake: &c.Fake}
+// EnterpriseEnterprisesolo retrieves the EnterpriseEnterprisesoloClient
+func (c *Clientset) EnterpriseEnterprisesolo() enterpriseenterprisesolo.EnterpriseEnterprisesoloInterface {
+	return &fakeenterpriseenterprisesolo.FakeEnterpriseEnterprisesolo{Fake: &c.Fake}
 }
