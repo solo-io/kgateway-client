@@ -238,6 +238,10 @@ type WAFConfiguration struct {
 	// +kubebuilder:validation:Enum=error;warn;info;debug;trace
 	// +optional
 	LogLevel *WAFLogLevel `json:"logLevel,omitempty"`
+
+	// Admin configures the WAF admin server.
+	// +optional
+	Admin *WAFAdminConfiguration `json:"admin,omitempty"`
 }
 
 type WAFLogLevel string
@@ -249,3 +253,10 @@ const (
 	WAFLogLevelDebug WAFLogLevel = "debug"
 	WAFLogLevelTrace WAFLogLevel = "trace"
 )
+
+type WAFAdminConfiguration struct {
+	// Enabled indicates whether the admin server is enabled. If not enabled, then no admin server will be deployed.
+	// Defaults to false.
+	// +optional
+	Enabled *bool `json:"enabled,omitempty"`
+}
