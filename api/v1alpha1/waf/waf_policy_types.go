@@ -5,6 +5,16 @@ import (
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
+const (
+	// WAFPolicyConditionReady is the condition type indicating whether the WAFPolicy was accepted by the WAF server.
+	WAFPolicyConditionReady = "Ready"
+
+	// WAFPolicyReasonAccepted indicates the WAFPolicy was accepted.
+	WAFPolicyReasonAccepted = "Accepted"
+	// WAFPolicyReasonError indicates an error occurred when trying to process the WAFPolicy.
+	WAFPolicyReasonError = "Error"
+)
+
 // +kubebuilder:rbac:groups=waf.solo.io,resources=wafpolicies,verbs=get;list;watch;update
 // +kubebuilder:rbac:groups=waf.solo.io,resources=wafpolicies/status,verbs=get;update;patch
 
@@ -29,7 +39,23 @@ type WAFPolicy struct {
 
 	// Status is the status of the WAF policy
 	// +optional
-	Status gwv1.PolicyStatus `json:"status,omitempty"` // nolint:kubeapilinter // optionalfields - allow status to be a non-pointer
+	Status WAFPolicyStatus `json:"status,omitempty"` // nolint:kubeapilinter // optionalfields - allow status to be a non-pointer
+}
+
+// WAFPolicyStatus contains WAF server acceptance status and per-ancestor (traffic policy) attachment status.
+type WAFPolicyStatus struct {
+	// Conditions contains information about WAF server acceptance of the WAFPolicy.
+	// +listType=map
+	// +listMapKey=type
+	// +patchStrategy=merge
+	// +patchMergeKey=type
+	// +optional
+	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
+
+	// Ancestors contains attachment information for referencing resources.
+	// +kubebuilder:validation:MaxItems=16
+	// +optional
+	Ancestors []gwv1.PolicyAncestorStatus `json:"ancestors,omitempty"`
 }
 
 // WAFPolicySpec contains Web Application Firewall configuration.
