@@ -1,6 +1,6 @@
 package enterprisekgateway
 
-// TransformationExtractMode represents the mode of operation for the extraction, which configures how the tranformation
+// TransformationExtractMode represents the mode of operation for the extraction, which configures how the transformation
 // will extract the content of a specified capturing group.
 // +kubebuilder:validation:Enum=Extract;SingleReplace;ReplaceAll
 type TransformationExtractMode string
