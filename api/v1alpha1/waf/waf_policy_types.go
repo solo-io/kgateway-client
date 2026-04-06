@@ -78,6 +78,51 @@ type WAFPolicySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	// +optional
 	CustomDirectives []DirectiveSource `json:"customDirectives,omitempty"`
+
+	// CustomInterventionResponse is a custom response to send when a request is blocked by WAF.
+	// If not set, returns the status code defined by the WAF rule that was triggered.
+	// +optional
+	CustomInterventionResponse *CustomInterventionResponse `json:"customInterventionResponse,omitempty"`
+}
+
+// CustomInterventionResponse defines the response returned when WAF blocks a request or response.
+type CustomInterventionResponse struct {
+	// StatusCode overrides the HTTP status code returned when WAF blocks a request or response.
+	// If not set, the status code defined by the triggered WAF rule is used.
+	// +kubebuilder:validation:Minimum=100
+	// +kubebuilder:validation:Maximum=599
+	// +optional
+	StatusCode *int32 `json:"statusCode,omitempty"`
+
+	// Headers sets the response headers returned when WAF blocks a request or response.
+	// If not set, no header modifications are made.
+	// +optional
+	Headers *CustomInterventionResponseHeaders `json:"headers,omitempty"`
+
+	// Body overrides the response body returned when WAF blocks a request or response.
+	// If not set, the response body is empty.
+	// +optional
+	Body *string `json:"body,omitempty"`
+}
+
+// CustomInterventionResponseHeaders defines headers returned when WAF blocks a request.
+type CustomInterventionResponseHeaders struct {
+	// SetHeaders is the list of headers to set on the response.
+	// +optional
+	// +kubebuilder:validation:MaxItems=32
+	SetHeaders []CustomInterventionResponseHeader `json:"setHeaders,omitempty"`
+}
+
+// CustomInterventionResponseHeader defines a single header returned when WAF blocks a request.
+type CustomInterventionResponseHeader struct {
+	// Name is the header name.
+	// +kubebuilder:validation:MinLength=1
+	// +required
+	Name string `json:"name"`
+
+	// Value is the header value.
+	// +required
+	Value string `json:"value"`
 }
 
 // DirectiveSource is a set of directives (e.g. rules or settings) to provide to the WAF engine.
