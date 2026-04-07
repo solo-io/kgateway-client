@@ -1,17 +1,17 @@
 module github.com/solo-io/kgateway-client/v2
 
-go 1.26.0
+go 1.26.1
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/kgateway-dev/kgateway/v2 v2.3.0-beta.2.0.20260302192636-4e63b3eb14b3
+	github.com/kgateway-dev/kgateway/v2 v2.3.0-beta.4.0.20260407201509-df1058c85cba
 	github.com/solo-io/protoc-gen-ext v0.1.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20251213004720-97cd9d5aeac2
+	google.golang.org/genproto/googleapis/api v0.0.0-20260209200024-4cfbd4190f57
 	google.golang.org/protobuf v1.36.11
 	k8s.io/api v0.35.1
 	k8s.io/apimachinery v0.35.1
 	k8s.io/client-go v0.35.1
-	sigs.k8s.io/gateway-api v1.4.1
+	sigs.k8s.io/gateway-api v1.5.1
 )
 
 require (
@@ -33,8 +33,7 @@ require (
 	github.com/go-openapi/swag/stringutils v0.25.4 // indirect
 	github.com/go-openapi/swag/typeutils v0.25.4 // indirect
 	github.com/go-openapi/swag/yamlutils v0.25.4 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/google/gnostic-models v0.7.0 // indirect
+	github.com/google/gnostic-models v0.7.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -46,19 +45,19 @@ require (
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/net v0.50.0 // indirect
-	golang.org/x/oauth2 v0.34.0 // indirect
+	golang.org/x/oauth2 v0.35.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	k8s.io/apiextensions-apiserver v0.34.1 // indirect
+	k8s.io/apiextensions-apiserver v0.35.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912 // indirect
-	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4 // indirect
+	k8s.io/kube-openapi v0.0.0-20251125145642-4e65d59e963e // indirect
+	k8s.io/utils v0.0.0-20260108192941-914a6e750570 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
-	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
+	sigs.k8s.io/structured-merge-diff/v6 v6.3.2 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
