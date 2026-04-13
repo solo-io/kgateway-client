@@ -1,10 +1,10 @@
 module github.com/solo-io/kgateway-client/v2
 
-go 1.26.1
+go 1.26.2
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/kgateway-dev/kgateway/v2 v2.3.0-beta.4.0.20260407201509-df1058c85cba
+	github.com/kgateway-dev/kgateway/v2 v2.3.0-beta.5
 	github.com/solo-io/protoc-gen-ext v0.1.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260209200024-4cfbd4190f57
 	google.golang.org/protobuf v1.36.11
