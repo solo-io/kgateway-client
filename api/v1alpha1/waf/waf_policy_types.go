@@ -71,6 +71,11 @@ type WAFPolicySpec struct {
 	// +required
 	RuleEngineSettings DirectiveSource `json:"ruleEngineSettings"`
 
+	// ProcessingConfig configures how request and response traffic is inspected by WAF.
+	// If not set, request headers and response headers will be inspected.
+	// +optional
+	ProcessingConfig *ProcessingConfig `json:"processingConfig,omitempty"`
+
 	// CustomDirectives is a list of custom directives to apply.
 	// Custom directives will be applied after the CoreRuleSet rules and settings (if enabled) and WAF rule engine settings,
 	// and can be used to modify/exclude CoreRuleSet rules or add custom rules, for example.
@@ -152,6 +157,60 @@ type ConfigMapRef struct {
 	// +optional
 	// +kubebuilder:validation:MinItems=1
 	Keys []string `json:"keys,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=Headers;HeadersAndBody
+type RequestProcessingMode string
+
+const (
+	// RequestProcessingModeHeaders configures the WAF server to inspect request headers
+	RequestProcessingModeHeaders RequestProcessingMode = "Headers"
+
+	// RequestProcessingModeHeadersAndBody configures the WAF server to inspect request headers and body
+	RequestProcessingModeHeadersAndBody RequestProcessingMode = "HeadersAndBody"
+)
+
+// +kubebuilder:validation:Enum=None;Headers;HeadersAndBody
+type ResponseProcessingMode string
+
+const (
+	// ResponseProcessingModeNone configures the WAF server to not inspect the response at all
+	ResponseProcessingModeNone ResponseProcessingMode = "None"
+
+	// ResponseProcessingModeHeaders configures the WAF server to inspect response headers
+	ResponseProcessingModeHeaders ResponseProcessingMode = "Headers"
+
+	// ResponseProcessingModeHeadersAndBody configures the WAF server to inspect response headers and body
+	ResponseProcessingModeHeadersAndBody ResponseProcessingMode = "HeadersAndBody"
+)
+
+// ProcessingConfig configures how request and response traffic is inspected by WAF.
+type ProcessingConfig struct {
+	// Request configures how request traffic is inspected by WAF.
+	// If not set, defaults to inspect headers only.
+	// +optional
+	Request *RequestProcessingConfig `json:"request,omitempty"`
+
+	// Response configures how response traffic is inspected by WAF.
+	// If not set, defaults to inspect headers only.
+	// +optional
+	Response *ResponseProcessingConfig `json:"response,omitempty"`
+}
+
+// RequestProcessingConfig configures how request traffic is inspected by WAF.
+type RequestProcessingConfig struct {
+	// Mode controls which parts of a request are inspected by WAF.
+	// If not set, defaults to Headers.
+	// +optional
+	Mode *RequestProcessingMode `json:"mode,omitempty"`
+}
+
+// ResponseProcessingConfig configures how response traffic is inspected by WAF.
+type ResponseProcessingConfig struct {
+	// Mode controls which parts of a response are inspected by WAF.
+	// If not set, defaults to Headers.
+	// +optional
+	Mode *ResponseProcessingMode `json:"mode,omitempty"`
 }
 
 // CoreRuleSet specifies custom settings for the OWASP CoreRuleSet.
