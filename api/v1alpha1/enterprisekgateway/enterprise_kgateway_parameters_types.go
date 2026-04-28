@@ -126,9 +126,9 @@ type Mode string
 
 type Extensions struct {
 	// +optional
-	ExtAuth *DeploymentConfiguration `json:"extauth,omitempty"`
+	ExtAuth *ExtAuthConfiguration `json:"extauth,omitempty"`
 	// +optional
-	RateLimiter *DeploymentConfiguration `json:"ratelimiter,omitempty"`
+	RateLimiter *RateLimiterConfiguration `json:"ratelimiter,omitempty"`
 	// +optional
 	ExtCache *DeploymentConfiguration `json:"extCache,omitempty"`
 
@@ -229,6 +229,255 @@ type ContainerConfiguration struct {
 	//
 	// +optional
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
+}
+
+// RateLimiterConfiguration configures the RateLimit server deployment.
+type RateLimiterConfiguration struct {
+	DeploymentConfiguration `json:",inline"`
+
+	// Redis configures the Redis connection for the RateLimit server.
+	// When specified, the RateLimit server connects to this Redis instance
+	// instead of the managed ext-cache Redis.
+	//
+	// +optional
+	Redis *RedisClientConfig `json:"redis,omitempty"`
+
+	// ServiceAccountName sets the serviceAccountName on the generated RateLimit
+	// Deployment. Use this to attach a ServiceAccount configured for AWS
+	// credentials, such as through IRSA or EKS Pod Identity, for AWS
+	// ElastiCache IAM authentication.
+	//
+	// +optional
+	ServiceAccountName *string `json:"serviceAccountName,omitempty"`
+}
+
+// ExtAuthConfiguration configures the ExtAuth server deployment.
+type ExtAuthConfiguration struct {
+	DeploymentConfiguration `json:",inline"`
+
+	// SessionRedis configures the server-level default Redis connection for
+	// ExtAuth session storage (OAuth2/OIDC). When specified, individual
+	// AuthConfig CRs do not need to repeat connection details in their
+	// RedisOptions fields, though per-AuthConfig overrides are still supported.
+	//
+	// +optional
+	SessionRedis *RedisClientConfig `json:"sessionRedis,omitempty"`
+
+	// ServiceAccountName sets the serviceAccountName on the generated ExtAuth
+	// Deployment. Use this to attach a ServiceAccount configured for AWS
+	// credentials, such as through IRSA or EKS Pod Identity, for AWS
+	// ElastiCache IAM authentication.
+	//
+	// +optional
+	ServiceAccountName *string `json:"serviceAccountName,omitempty"`
+}
+
+// RedisClientConfig is a reusable Redis connection configuration structure
+// shared by both the RateLimit and ExtAuth sections of EnterpriseKgatewayParameters.
+//
+// +kubebuilder:validation:XValidation:rule="!has(self.certs) || (has(self.socketType) && self.socketType == 'tls')",message="certs can only be set when socketType is 'tls'"
+type RedisClientConfig struct {
+	// Address is the Redis server address in "host:port" format, or a Unix
+	// socket path when socketType is "unix".
+	// Examples: "redis.example.com:6379", "my-redis.default.svc.cluster.local:6379", "/var/run/redis/redis.sock"
+	//
+	// +required
+	Address string `json:"address"`
+
+	// DB is the Redis database index.
+	// Defaults to 0 if not specified.
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=0
+	DB *int32 `json:"db,omitempty"`
+
+	// SocketType specifies the connection type: "tcp", "tls", or "unix".
+	// Defaults to "tcp" if not specified.
+	//
+	// +optional
+	// +kubebuilder:validation:Enum=tcp;tls;unix
+	SocketType *string `json:"socketType,omitempty"`
+
+	// Clustered enables Redis Cluster mode.
+	// When true, the client uses a ClusterClient that handles MOVED/ASK redirects.
+	//
+	// +optional
+	Clustered *bool `json:"clustered,omitempty"`
+
+	// Certs configures TLS certificates for the Redis connection.
+	// Only applicable when SocketType is "tls".
+	//
+	// +optional
+	Certs *RedisCerts `json:"certs,omitempty"`
+
+	// Auth configures authentication for the Redis connection.
+	// Exactly one of secretRef or aws should be specified.
+	// If not specified, no authentication is used.
+	//
+	// +optional
+	Auth *RedisAuth `json:"auth,omitempty"`
+
+	// Connection configures connection pool and timeout tuning parameters.
+	// When not specified, Redis client library defaults apply.
+	//
+	// +optional
+	Connection *RedisConnectionConfig `json:"connection,omitempty"`
+}
+
+// RedisCerts configures TLS certificates for the Redis connection.
+type RedisCerts struct {
+	// CACertSecretRef references a Kubernetes Secret containing the CA certificate
+	// for verifying the Redis server's TLS certificate.
+	//
+	// +optional
+	CACertSecretRef *corev1.SecretReference `json:"caCertSecretRef,omitempty"`
+
+	// CACertKey is the key within the Secret that contains the CA certificate in PEM format.
+	// Defaults to "ca.crt" if not specified.
+	//
+	// +optional
+	CACertKey *string `json:"caCertKey,omitempty"`
+}
+
+// RedisAuth configures authentication for a Redis connection.
+// This is a discriminated union: specify exactly one of secretRef or aws.
+// +kubebuilder:validation:ExactlyOneOf=secretRef;aws
+type RedisAuth struct {
+	// SecretRef configures static credential authentication using a Kubernetes Secret
+	// containing username and password.
+	//
+	// +optional
+	SecretRef *RedisSecretAuth `json:"secretRef,omitempty"`
+
+	// AWS configures AWS ElastiCache IAM authentication.
+	// No static credentials are stored; tokens are generated at runtime
+	// using AWS credentials available to the pod.
+	//
+	// +optional
+	AWS *RedisAWSAuth `json:"aws,omitempty"`
+}
+
+// RedisSecretAuth configures Redis authentication from a Kubernetes Secret.
+type RedisSecretAuth struct {
+	// Name is the name of the Kubernetes Secret containing Redis credentials.
+	//
+	// +required
+	Name string `json:"name"`
+
+	// Namespace is the namespace of the Secret. If not specified, the Secret
+	// is assumed to be in the same namespace as the extension Deployment.
+	//
+	// +optional
+	Namespace *string `json:"namespace,omitempty"`
+
+	// PasswordKey is the key in the Secret that contains the Redis password.
+	// Defaults to "password" if not specified.
+	//
+	// +optional
+	PasswordKey *string `json:"passwordKey,omitempty"`
+
+	// UsernameKey is the key in the Secret that contains the Redis username.
+	// Defaults to "username" if not specified.
+	//
+	// +optional
+	UsernameKey *string `json:"usernameKey,omitempty"`
+}
+
+// RedisAWSAuth configures AWS ElastiCache IAM authentication.
+// Requires the pod to have AWS credentials, such as through IRSA or EKS Pod Identity.
+type RedisAWSAuth struct {
+	// Region is the AWS region of the ElastiCache cluster.
+	//
+	// +required
+	Region string `json:"region"`
+
+	// ClusterName is the ElastiCache replication group ID.
+	//
+	// +required
+	ClusterName string `json:"clusterName"`
+
+	// UserName is the ElastiCache user ID with IAM authentication enabled.
+	//
+	// +required
+	UserName string `json:"userName"`
+
+	// ServerlessCacheName is the AWS ElastiCache Serverless cache name used in
+	// the IAM token signature. Set this for Serverless ElastiCache deployments;
+	// the value is distinct from Address (which remains the Redis endpoint
+	// host:port). Leave unset for provisioned ElastiCache clusters.
+	//
+	// +optional
+	ServerlessCacheName *string `json:"serverlessCacheName,omitempty"`
+}
+
+// RedisConnectionConfig configures connection pool and timeout tuning for Redis.
+type RedisConnectionConfig struct {
+	// PoolSize is the maximum number of connections in the pool.
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=1
+	PoolSize *int32 `json:"poolSize,omitempty"`
+
+	// MinIdleConns is the minimum number of idle connections in the pool.
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=0
+	MinIdleConns *int32 `json:"minIdleConns,omitempty"`
+
+	// MaxIdleConns is the maximum number of idle connections in the pool.
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=0
+	MaxIdleConns *int32 `json:"maxIdleConns,omitempty"`
+
+	// DialTimeout is the timeout for establishing new connections.
+	//
+	// +optional
+	DialTimeout *metav1.Duration `json:"dialTimeout,omitempty"`
+
+	// ReadTimeout is the timeout for reading a single command reply.
+	//
+	// +optional
+	ReadTimeout *metav1.Duration `json:"readTimeout,omitempty"`
+
+	// WriteTimeout is the timeout for writing a single command.
+	//
+	// +optional
+	WriteTimeout *metav1.Duration `json:"writeTimeout,omitempty"`
+
+	// PoolTimeout is the time to wait for a connection from the pool
+	// when all connections are busy.
+	//
+	// +optional
+	PoolTimeout *metav1.Duration `json:"poolTimeout,omitempty"`
+
+	// ConnMaxIdleTime is the maximum time a connection may be idle before
+	// being closed.
+	//
+	// +optional
+	ConnMaxIdleTime *metav1.Duration `json:"connMaxIdleTime,omitempty"`
+
+	// ConnMaxLifetime is the maximum lifetime of a connection before it is
+	// closed and recreated, regardless of activity.
+	//
+	// +optional
+	ConnMaxLifetime *metav1.Duration `json:"connMaxLifetime,omitempty"`
+
+	// MaxRetries is the maximum number of retries on failed commands.
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=0
+	MaxRetries *int32 `json:"maxRetries,omitempty"`
+
+	// MinRetryBackoff is the minimum backoff interval between retries.
+	//
+	// +optional
+	MinRetryBackoff *metav1.Duration `json:"minRetryBackoff,omitempty"`
+
+	// MaxRetryBackoff is the maximum backoff interval between retries.
+	//
+	// +optional
+	MaxRetryBackoff *metav1.Duration `json:"maxRetryBackoff,omitempty"`
 }
 
 type WAFConfiguration struct {
