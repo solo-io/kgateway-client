@@ -491,6 +491,10 @@ type WAFConfiguration struct {
 	// Admin configures the WAF admin server.
 	// +optional
 	Admin *WAFAdminConfiguration `json:"admin,omitempty"`
+
+	// Metrics configures the WAF metrics endpoint.
+	// +optional
+	Metrics *WAFMetricsConfiguration `json:"metrics,omitempty"`
 }
 
 type WAFLogLevel string
@@ -506,6 +510,13 @@ const (
 type WAFAdminConfiguration struct {
 	// Enabled indicates whether the admin server is enabled. If not enabled, then no admin server will be deployed.
 	// Defaults to false.
+	// +optional
+	Enabled *bool `json:"enabled,omitempty"`
+}
+
+type WAFMetricsConfiguration struct {
+	// Enabled indicates whether the metrics endpoint is enabled.
+	// Defaults to true.
 	// +optional
 	Enabled *bool `json:"enabled,omitempty"`
 }
