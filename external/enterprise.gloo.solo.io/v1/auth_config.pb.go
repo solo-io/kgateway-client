@@ -7,12 +7,6 @@
 package v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
-	v1 "k8s.io/api/core/v1"
-
 	_ "github.com/solo-io/protoc-gen-ext/extproto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -21,6 +15,10 @@ import (
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
+	v1 "k8s.io/api/core/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -3014,7 +3012,10 @@ type JwtValidation struct {
 	JwksSourceSpecifier isJwtValidation_JwksSourceSpecifier `protobuf_oneof:"jwks_source_specifier"`
 	// Allow only tokens that have been issued by this principal (i.e. whose "iss" claim matches this value).
 	// If empty, issuer validation will be skipped.
-	Issuer        string `protobuf:"bytes,3,opt,name=issuer,proto3" json:"issuer,omitempty"`
+	Issuer string `protobuf:"bytes,3,opt,name=issuer,proto3" json:"issuer,omitempty"`
+	// List of JWT audiences allowed for this provider. The token's "aud" claim
+	// must intersect this list. If empty or unset, audience validation is skipped.
+	Audiences     []string `protobuf:"bytes,4,rep,name=audiences,proto3" json:"audiences,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3079,6 +3080,13 @@ func (x *JwtValidation) GetIssuer() string {
 		return x.Issuer
 	}
 	return ""
+}
+
+func (x *JwtValidation) GetAudiences() []string {
+	if x != nil {
+		return x.Audiences
+	}
+	return nil
 }
 
 type isJwtValidation_JwksSourceSpecifier interface {
@@ -8261,13 +8269,14 @@ const file_github_com_solo_io_solo_apis_api_gloo_enterprise_gloo_v1_auth_config_
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aK\n" +
 	"\x1dTokenEndpointQueryParamsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x81\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x9f\x03\n" +
 	"\rJwtValidation\x12T\n" +
 	"\vremote_jwks\x18\x01 \x01(\v21.enterprise.gloo.solo.io.JwtValidation.RemoteJwksH\x00R\n" +
 	"remoteJwks\x12Q\n" +
 	"\n" +
 	"local_jwks\x18\x02 \x01(\v20.enterprise.gloo.solo.io.JwtValidation.LocalJwksH\x00R\tlocalJwks\x12\x16\n" +
-	"\x06issuer\x18\x03 \x01(\tR\x06issuer\x1ad\n" +
+	"\x06issuer\x18\x03 \x01(\tR\x06issuer\x12\x1c\n" +
+	"\taudiences\x18\x04 \x03(\tR\taudiences\x1ad\n" +
 	"\n" +
 	"RemoteJwks\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12D\n" +
