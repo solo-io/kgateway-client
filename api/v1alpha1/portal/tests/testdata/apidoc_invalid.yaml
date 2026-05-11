@@ -1,0 +1,134 @@
+_err: "spec.source.url.endpoint"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: url-invalid-scheme
+spec:
+  source:
+    url:
+      endpoint: ftp://example.com/openapi.json
+  servedBy:
+    group: ""
+    kind: Service
+    name: my-service
+    port: 8080
+---
+_err: "spec.source.url.endpoint"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: url-no-scheme
+spec:
+  source:
+    url:
+      endpoint: example.com/openapi.json
+  servedBy:
+    group: ""
+    kind: Service
+    name: my-service
+    port: 8080
+---
+_err: "spec.source.kube.path"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: kube-path-no-leading-slash
+spec:
+  source:
+    kube:
+      targetRef:
+        group: ""
+        kind: Service
+        name: my-service
+        port: 8080
+      path: openapi
+---
+_err: "Must have port for Service reference"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: kube-service-missing-port
+spec:
+  source:
+    kube:
+      targetRef:
+        group: ""
+        kind: Service
+        name: my-service
+      path: /openapi
+---
+_err: "targetRef must reference a core Service or a gateway.kgateway.dev Backend"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: kube-targetref-wrong-group
+spec:
+  source:
+    kube:
+      targetRef:
+        group: wrong.group.io
+        kind: Service
+        name: my-service
+      path: /openapi
+---
+_err: "targetRef must reference a core Service or a gateway.kgateway.dev Backend"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: kube-targetref-wrong-kind
+spec:
+  source:
+    kube:
+      targetRef:
+        group: ""
+        kind: Deployment
+        name: my-deployment
+      path: /openapi
+---
+_err: "servedBy must reference a core Service, gateway.kgateway.dev Backend, or portal.solo.io Stitched"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: servedby-wrong-group
+spec:
+  source:
+    manual:
+      content: "openapi: 3.0.0"
+  servedBy:
+    group: wrong.group.io
+    kind: Service
+    name: my-service
+---
+_err: "servedBy must reference a core Service, gateway.kgateway.dev Backend, or portal.solo.io Stitched"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: servedby-wrong-kind
+spec:
+  source:
+    manual:
+      content: "openapi: 3.0.0"
+  servedBy:
+    group: ""
+    kind: ConfigMap
+    name: my-configmap
+---
+_err: "servedBy is required for manual and url sources"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: manual-source-missing-servedby
+spec:
+  source:
+    manual:
+      content: "openapi: 3.0.0"
+---
+_err: "servedBy is required for manual and url sources"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: url-source-missing-servedby
+spec:
+  source:
+    url:
+      endpoint: https://example.com/openapi.json

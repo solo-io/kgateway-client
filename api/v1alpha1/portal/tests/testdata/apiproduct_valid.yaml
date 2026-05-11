@@ -1,0 +1,154 @@
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: basic-valid
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: my-route
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: multiple-versions
+spec:
+  id: multi-version-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route-v1
+    - name: v2
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route-v2
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: multiple-targetrefs
+spec:
+  id: multi-route-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route-a
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route-b
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: id-with-hyphens
+spec:
+  id: my-api-product-v1
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: version-with-dots
+spec:
+  id: api
+  versions:
+    - name: 1.0.0
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: version-with-underscore
+spec:
+  id: api
+  versions:
+    - name: v1_beta
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: version-with-hyphen
+spec:
+  id: api
+  versions:
+    - name: v1-beta
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: with-apidoc-selectors
+spec:
+  id: selector-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: my-route
+          apiDocSelectors:
+            - name: partner-apidoc
+              namespace: default
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: same-route-different-selectors
+spec:
+  id: multi-selector-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: my-route
+          apiDocSelectors:
+            - name: partner-apidoc
+              namespace: default
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: my-route
+          apiDocSelectors:
+            - name: admin-apidoc
+              namespace: default
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: same-targetref-selectors-same-name-different-namespace
+spec:
+  id: multi-selector-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: my-route
+          apiDocSelectors:
+            - name: partner-apidoc
+              namespace: default
+            - name: partner-apidoc
+              namespace: other-ns

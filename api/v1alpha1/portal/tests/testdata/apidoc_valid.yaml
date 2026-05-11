@@ -1,0 +1,69 @@
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: manual-source
+spec:
+  source:
+    manual:
+      content: |
+        openapi: "3.0.0"
+        info:
+          title: Test API
+          version: "1.0"
+        paths: {}
+  servedBy:
+    group: ""
+    kind: Service
+    name: my-service
+    port: 8080
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: url-source-https
+spec:
+  source:
+    url:
+      endpoint: https://example.com/openapi.json
+  servedBy:
+    group: ""
+    kind: Service
+    name: my-service
+    port: 8080
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: kube-source-service
+spec:
+  source:
+    kube:
+      targetRef:
+        group: ""
+        kind: Service
+        name: my-service
+        port: 8080
+      path: /openapi
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: kube-source-backend
+spec:
+  source:
+    kube:
+      targetRef:
+        group: gateway.kgateway.dev
+        kind: Backend
+        name: my-backend
+      path: /v3/api-docs
+---
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: stitched-source
+spec:
+  source:
+    stitched:
+      content: |
+        {"openapi":"3.0.0","info":{"title":"Test API","version":"1.0"},"paths":{}}

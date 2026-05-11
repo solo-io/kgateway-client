@@ -1,0 +1,195 @@
+_err: "Duplicate value"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: duplicate-version-names
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route-a
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route-b
+---
+_err: "duplicate targetRef names require each entry to specify distinct non-empty apiDocSelectors"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: duplicate-targetref-names
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: same-route
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: same-route
+---
+_err: "duplicate targetRef names require each entry to specify distinct non-empty apiDocSelectors"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: duplicate-targetref-names-partial-selectors
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: same-route
+          apiDocSelectors:
+            - name: some-apidoc
+              namespace: default
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: same-route
+---
+_err: "duplicate targetRef names require each entry to specify distinct non-empty apiDocSelectors"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: duplicate-targetref-names-same-selectors
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: same-route
+          apiDocSelectors:
+            - name: partner-apidoc
+              namespace: default
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: same-route
+          apiDocSelectors:
+            - name: partner-apidoc
+              namespace: default
+---
+_err: "targetRefs must reference HTTPRoute resources from gateway.networking.k8s.io"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: wrong-group
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: wrong.group.io
+          kind: HTTPRoute
+          name: my-route
+---
+_err: "targetRefs must reference HTTPRoute resources from gateway.networking.k8s.io"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: wrong-kind
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: GRPCRoute
+          name: my-route
+---
+_err: "spec.id"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: id-starts-with-hyphen
+spec:
+  id: "-invalid-id"
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+_err: "spec.id"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: id-ends-with-hyphen
+spec:
+  id: "invalid-id-"
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+_err: "spec.id"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: id-with-special-chars
+spec:
+  id: "my_api"
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+_err: "spec.versions[0].name"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: version-starts-with-dot
+spec:
+  id: my-api
+  versions:
+    - name: ".1.0"
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+_err: "spec.versions[0].name"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: version-starts-with-hyphen
+spec:
+  id: my-api
+  versions:
+    - name: "-v1"
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: route
+---
+_err: "Duplicate value"
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiProduct
+metadata:
+  name: duplicate-apidoc-selectors
+spec:
+  id: my-api
+  versions:
+    - name: v1
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: my-route
+          apiDocSelectors:
+            - name: same-doc
+              namespace: default
+            - name: same-doc
+              namespace: default
