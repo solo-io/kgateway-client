@@ -157,6 +157,9 @@ import (
     // Solo Enterprise for kgateway client
     entkgatewayclient "github.com/solo-io/kgateway-client/v2/clientset/versioned"
 
+    // Portal for Solo Enterprise for kgateway client
+    portalclient "github.com/solo-io/kgateway-client/v2/portal/clientset/versioned"
+
     // Upstream kgateway client (version managed by kgateway-client)
     kgatewayclient "github.com/kgateway-dev/kgateway/v2/pkg/client/clientset/versioned"
 
