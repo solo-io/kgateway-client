@@ -63,7 +63,7 @@ Validates and merges trusted sync PRs opened against `main`.
 - `sync-pr-ci`
   - runs on `pull_request`
   - only for branch `sync/gloo-gateway-clientset`
-  - compile-checks `./api/...` and `./clientset/...`
+  - compile-checks `./api/...`,  `./clientset/...` and `./portal/...`
 - `merge-sync-pr`
   - runs on `pull_request_target`
   - only for branch `sync/gloo-gateway-clientset`
