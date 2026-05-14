@@ -1,0 +1,171 @@
+package v1alpha1
+
+import (
+	upstream "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/kgateway"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
+)
+
+// +kubebuilder:rbac:groups=portal.solo.io,resources=portalparameters,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=portal.solo.io,resources=portalparameters/status,verbs=get;update;patch
+
+// PortalParameters defines operational configuration for a Portal deployment,
+// including data store settings and postgres connection details.
+//
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories={portal},path=portalparameters
+// +kubebuilder:subresource:status
+// +kubebuilder:metadata:labels={app=gloo,app.kubernetes.io/name=portalparameters}
+type PortalParameters struct {
+	metav1.TypeMeta `json:",inline"`
+	//nolint:kubeapilinter // consistent with Portal type
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// spec defines the desired operational configuration for the Portal
+	// +required
+	Spec PortalParametersSpec `json:"spec"`
+
+	// Status defines the observed state of the PortalParameters
+	// +optional
+	//nolint:kubeapilinter
+	Status PortalParametersStatus `json:"status,omitempty"`
+}
+
+// PortalParametersSpec defines the desired operational configuration for a Portal deployment.
+type PortalParametersSpec struct {
+	// store configures the data store for the portal backend.
+	// Exactly one store type must be specified. If omitted, defaults to in-memory.
+	// +optional
+	Store *StoreConfig `json:"store,omitempty"`
+
+	// webServer configures the portal web server deployment.
+	// +optional
+	WebServer *PortalWebServer `json:"webServer,omitempty"`
+
+	// idpServerURL is the URL of an Identity Provider SPI server for OAuth client management.
+	// When set, OAuth credential create/delete operations are delegated to this external server
+	// (e.g., Keycloak via gloo-portal-idp-connect). When omitted, oauth endpoint will return a 500.
+	// +optional
+	IdpServerURL *string `json:"idpServerURL,omitempty"`
+}
+
+// PortalWebServer configures the portal web server deployment.
+type PortalWebServer struct {
+	// replicas is the number of portal web server pods.
+	// If omitted, defaults to 1. If using an HPA, do not set this field.
+	// +kubebuilder:validation:Minimum=0
+	// +optional
+	Replicas *int32 `json:"replicas,omitempty"`
+
+	// resources configures CPU and memory requests/limits for the portal web server container.
+	// +optional
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+
+	// container configures the portal web server container.
+	// +optional
+	Container *PortalWebServerContainer `json:"container,omitempty"`
+
+	// GatewayParametersOverlays contains overlay fields for portal web server resources.
+	// These allow applying strategic merge patches and creating HPA/PDB/VPA resources.
+	upstream.GatewayParametersOverlays `json:",inline"`
+}
+
+// PortalWebServerContainer configures the portal web server container.
+type PortalWebServerContainer struct {
+	// image overrides the portal web server container image.
+	// Individual fields (registry, repository, tag, pullPolicy) can be set
+	// independently; unset fields retain the chart defaults.
+	// +optional
+	Image *upstream.Image `json:"image,omitempty"`
+}
+
+// StoreConfig configures the data store for the portal backend.
+// Exactly one store type must be specified.
+//
+// +kubebuilder:validation:ExactlyOneOf=memory;postgres
+type StoreConfig struct {
+	// memory selects the in-memory data store.
+	// +optional
+	Memory *MemoryStoreConfig `json:"memory,omitempty"`
+
+	// postgres selects a PostgreSQL data store.
+	// +optional
+	Postgres *PostgresStoreConfig `json:"postgres,omitempty"`
+}
+
+// MemoryStoreConfig configures an in-memory data store for the portal backend.
+// This store is ephemeral and data is lost on pod restart.
+type MemoryStoreConfig struct{}
+
+// PostgresStoreConfig configures a PostgreSQL data store for the portal backend.
+type PostgresStoreConfig struct {
+	// secretRef references a Secret containing postgres connection credentials.
+	// Required keys: host, database, username, password
+	// Optional keys: port (default: 5432), sslmode (default: require)
+	// +required
+	SecretRef LocalSecretReference `json:"secretRef,omitzero"`
+
+	// tls configures TLS for the postgres connection.
+	// +optional
+	TLS *PostgresTLSConfig `json:"tls,omitempty"`
+
+	// schema is the PostgreSQL schema name for portal tables.
+	// Defaults to "portal" if not specified.
+	// +kubebuilder:validation:Pattern=`^[a-zA-Z_][a-zA-Z0-9_]*$`
+	// +kubebuilder:validation:MaxLength=63
+	// +kubebuilder:validation:XValidation:rule="!self.startsWith('pg_')",message="schema name must not start with 'pg_'"
+	// +kubebuilder:validation:XValidation:rule="self != 'information_schema'",message="schema name must not be 'information_schema'"
+	// +kubebuilder:validation:XValidation:rule="self != 'public'",message="schema name must not be 'public'"
+	// +optional
+	Schema *string `json:"schema,omitempty"`
+}
+
+// LocalSecretReference identifies a Secret in the same namespace.
+type LocalSecretReference struct {
+	// name is the name of the Secret.
+	// +required
+	Name gwv1.ObjectName `json:"name"`
+}
+
+// +kubebuilder:validation:Enum=disable;require;verify-ca;verify-full
+type PostgresSSLMode string
+
+const (
+	PostgresSSLModeDisable    PostgresSSLMode = "disable"
+	PostgresSSLModeRequire    PostgresSSLMode = "require"
+	PostgresSSLModeVerifyCA   PostgresSSLMode = "verify-ca"
+	PostgresSSLModeVerifyFull PostgresSSLMode = "verify-full"
+)
+
+// PostgresTLSConfig configures TLS settings for the postgres connection.
+// +kubebuilder:validation:XValidation:rule="!has(self.mode) || self.mode == 'disable' || self.mode == 'require' || has(self.caCertSecretRef)",message="caCertSecretRef is required when mode is verify-ca or verify-full"
+// +kubebuilder:validation:XValidation:rule="!has(self.clientCertSecretRef) || !has(self.mode) || self.mode != 'disable'",message="clientCertSecretRef cannot be set when mode is disable"
+type PostgresTLSConfig struct {
+	// mode is the SSL mode for postgres: disable, require, verify-ca, verify-full.
+	// Overrides the sslmode key in the credentials secret if both are set.
+	// +optional
+	Mode *PostgresSSLMode `json:"mode,omitempty"`
+
+	// caCertSecretRef references a Secret containing a CA certificate (key: "ca.crt")
+	// for verifying the postgres server. Required for verify-ca and verify-full modes.
+	// +optional
+	CACertSecretRef *LocalSecretReference `json:"caCertSecretRef,omitempty"`
+
+	// clientCertSecretRef references a Secret containing a client certificate and key
+	// (keys: "tls.crt", "tls.key") for mutual TLS authentication with postgres.
+	// +optional
+	ClientCertSecretRef *LocalSecretReference `json:"clientCertSecretRef,omitempty"`
+}
+
+// PortalParametersStatus defines the observed state of PortalParameters.
+type PortalParametersStatus struct{}
+
+// PortalParametersList contains a list of PortalParameters resources
+// +kubebuilder:object:root=true
+type PortalParametersList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []PortalParameters `json:"items"`
+}
