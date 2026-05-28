@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/kgateway-dev/kgateway/v2 v2.3.0-rc.1.0.20260515020727-4a0af4992d1c
+	github.com/kgateway-dev/kgateway/v2 v2.3.0-rc.1.0.20260526175735-21f7396e7c21
 	github.com/solo-io/protoc-gen-ext v0.1.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260401024825-9d38bb4040a9
 	google.golang.org/protobuf v1.36.11
@@ -44,11 +44,11 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/term v0.41.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/term v0.43.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
