@@ -20,9 +20,9 @@ package scheme
 import (
 	enterprisekgatewayenterprisesolo "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisesolo"
 	enterprisekgatewayenterprisekgateway "github.com/solo-io/kgateway-client/v2/api/v1alpha1/enterprisekgateway"
-	enterprisekgatewaywaf "github.com/solo-io/kgateway-client/v2/api/v1alpha1/waf"
 	extauthv1 "github.com/solo-io/kgateway-client/v2/external/extauth.solo.io/v1"
 	ratelimitv1alpha1 "github.com/solo-io/kgateway-client/v2/external/ratelimit.solo.io/v1alpha1"
+	enterprisekgatewaywaf "github.com/solo-io/kgateway-client/v2/api/v1alpha1/waf"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
