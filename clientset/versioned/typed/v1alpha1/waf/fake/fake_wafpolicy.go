@@ -18,8 +18,8 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1waf "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/waf"
 	waf "github.com/solo-io/kgateway-client/v2/api/v1alpha1/waf"
+	v1alpha1waf "github.com/solo-io/kgateway-client/v2/clientset/versioned/typed/v1alpha1/waf"
 	gentype "k8s.io/client-go/gentype"
 )
 
