@@ -67,6 +67,13 @@ type PortalWebServer struct {
 	// +optional
 	Container *PortalWebServerContainer `json:"container,omitempty"`
 
+	// LogLevel sets the log level for the portal web server process. One of:
+	// "error", "warn", "info", "debug", "trace". When unset, the binary's
+	// default level (info) is used.
+	// +kubebuilder:validation:Enum=error;warn;info;debug;trace
+	// +optional
+	LogLevel *string `json:"logLevel,omitempty"`
+
 	// GatewayParametersOverlays contains overlay fields for portal web server resources.
 	// These allow applying strategic merge patches and creating HPA/PDB/VPA resources.
 	upstream.GatewayParametersOverlays `json:",inline"`

@@ -960,6 +960,11 @@ func (in *PortalWebServer) DeepCopyInto(out *PortalWebServer) {
 		*out = new(PortalWebServerContainer)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.LogLevel != nil {
+		in, out := &in.LogLevel, &out.LogLevel
+		*out = new(string)
+		**out = **in
+	}
 	in.GatewayParametersOverlays.DeepCopyInto(&out.GatewayParametersOverlays)
 }
 
