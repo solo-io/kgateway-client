@@ -162,7 +162,12 @@ type OpenAPIMetadata struct {
 	// +optional
 	TermsOfService *string `json:"termsOfService,omitempty"`
 
-	// contact is the contact information for this API (e.g., email or URL).
+	// contact is the contact information for this API. It may be an email
+	// address, a URL, or a contact name. A value that parses as an email is
+	// treated as an email address; a value that parses as a URL is treated as a
+	// URL; any other value is treated as a contact name. Email takes precedence,
+	// then URL. A URL must include a scheme (e.g. "https://") to be recognized
+	// as one; a bare host like "www.example.com" is treated as a contact name.
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
 	// +optional
