@@ -16,7 +16,7 @@ import (
 // and enterprise ExtAuth and RateLimiter extensions
 // +genclient
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:categories={enterprisekgateway,ekgw},path=enterprisekgatewayparameters
+// +kubebuilder:resource:categories={enterprisekgateway,ekgw},path=enterprisekgatewayparameters,shortName=ekgpar
 // +kubebuilder:subresource:status
 // +kubebuilder:metadata:labels={app=enterprisekgateway,app.kubernetes.io/name=enterprisekgatewayparameters}
 type EnterpriseKgatewayParameters struct {
