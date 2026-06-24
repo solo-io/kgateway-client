@@ -26,6 +26,14 @@ const (
 	PortalReasonApiProductError = "ApiProductError"
 	// PortalReasonNoApiProducts indicates no ApiProduct references are configured or none resolved.
 	PortalReasonNoApiProducts = "NoApiProducts"
+
+	// PortalConditionResolvedRefs indicates whether references in the Portal spec were successfully resolved.
+	PortalConditionResolvedRefs = "ResolvedRefs"
+
+	// PortalReasonResolvedRefs indicates all referenced resources were resolved.
+	PortalReasonResolvedRefs = "ResolvedRefs"
+	// PortalReasonInvalid indicates one or more references on the Portal spec could not be resolved.
+	PortalReasonInvalid = "Invalid"
 )
 
 // +kubebuilder:rbac:groups=portal.solo.io,resources=portals,verbs=get;list;watch;create;update;patch;delete
@@ -81,11 +89,27 @@ type PortalSpec struct {
 	// If empty, no API products are exposed.
 	// +listType=atomic
 	// +optional
-	ApiProductRefs []upstreamshared.NamespacedObjectReference `json:"apiProductRefs,omitempty"`
+	ApiProductRefs []PortalApiProductRef `json:"apiProductRefs,omitempty"` // nolint:kubeapilinter // arrayofstruct - required fields inherited from embedded NamespacedObjectReference
 
 	// visibility controls the access requirements for the portal's API catalog.
 	// +optional
 	Visibility *PortalVisibility `json:"visibility,omitempty"`
+}
+
+// PortalApiProductRef references an ApiProduct exposed by the Portal and
+// optionally attaches per-product VisibilityPolicy references
+type PortalApiProductRef struct {
+	upstreamshared.NamespacedObjectReference `json:",inline"`
+
+	// visibilityPolicyRefs references VisibilityPolicy resources in the Portal's namespace
+	// Multiple policies are unioned (OR across policies; OR across each policy's
+	// groups; AND within a group).
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	// +optional
+	VisibilityPolicyRefs []VisibilityPolicyReference `json:"visibilityPolicyRefs,omitempty"`
 }
 
 // PortalParametersReference identifies a PortalParameters resource in the same namespace.
@@ -95,13 +119,61 @@ type PortalParametersReference struct {
 	Name gwv1.ObjectName `json:"name"`
 }
 
+// VisibilityPolicyReference references a VisibilityPolicy in the same namespace as the referencing Portal.
+type VisibilityPolicyReference struct {
+	// name is the name of the VisibilityPolicy resource.
+	// +required
+	Name gwv1.ObjectName `json:"name"`
+}
+
 // PortalVisibility controls the access requirements for viewing the portal's API catalog
+//
+// +kubebuilder:validation:XValidation:rule="!(has(self.public) && self.public == true && has(self.visibilityPolicyRefs))",message="public cannot be true when visibilityPolicyRefs are defined"
 type PortalVisibility struct {
 	// public controls whether the portal's API catalog is publicly accessible without authentication.
 	// When true, unauthenticated users can browse the API catalog.
 	// When false (default), users must be logged in to view the catalog content.
+	// Cannot be true when visibilityPolicyRefs is set, since claim-based gating
+	// requires an authenticated user to have the necessary claims.
 	// +optional
 	Public *bool `json:"public,omitempty"`
+
+	// visibilityPolicyRefs references VisibilityPolicy resources in the Portal's
+	// namespace which are applied to every ApiProduct exposed by this Portal.
+	// These policies are combined with per-product visibilityPolicyRefs declared on apiProductRefs[].
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	// +optional
+	VisibilityPolicyRefs []VisibilityPolicyReference `json:"visibilityPolicyRefs,omitempty"`
+}
+
+// ClaimGroup is an AND of claims that must all be present on a subject's
+// identity to satisfy this group.
+type ClaimGroup struct {
+	// claimGroup lists the claims that must all be present for this group
+	// to grant access.
+	// +listType=atomic
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	// +required
+	Claims []Claim `json:"claimGroup"`
+}
+
+// Claim is a key/value pair to match against a subject's identity claims.
+type Claim struct {
+	// key is the claim name to match.
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +required
+	Key string `json:"key"`
+
+	// value is the claim value to match.
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +required
+	Value string `json:"value"`
 }
 
 // PortalStatus defines the observed state of Portal
