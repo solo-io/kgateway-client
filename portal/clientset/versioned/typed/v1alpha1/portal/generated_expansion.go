@@ -26,3 +26,5 @@ type PortalExpansion interface{}
 type PortalConfigExpansion interface{}
 
 type PortalParametersExpansion interface{}
+
+type VisibilityPolicyExpansion interface{}

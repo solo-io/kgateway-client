@@ -47,6 +47,10 @@ func (c *FakePortalPortal) PortalParameters(namespace string) portal.PortalParam
 	return newFakePortalParameters(c, namespace)
 }
 
+func (c *FakePortalPortal) VisibilityPolicies(namespace string) portal.VisibilityPolicyInterface {
+	return newFakeVisibilityPolicies(c, namespace)
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakePortalPortal) RESTClient() rest.Interface {

@@ -104,6 +104,11 @@ type PortalAPI struct {
 	// Web server fetches the spec from ApiDoc on-demand to avoid etcd size limits.
 	// +optional
 	ApiDocRef *ApiDocReference `json:"apiDocRef,omitempty"`
+
+	// visibility is the visibility configuration for the API.
+	// When nil, no gating applies for this API beyond the Portal level public flag.
+	// +optional
+	Visibility *PortalAPIVisibility `json:"visibility,omitempty"`
 }
 
 // AuthType indicates the type of authentication required.
@@ -134,4 +139,20 @@ type PortalConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []PortalConfig `json:"items"`
+}
+
+// PortalAPIVisibility is the per-API access requirement consumed by the portal web backend.
+type PortalAPIVisibility struct {
+	// membership is the deduped union of claim groups contributed by all
+	// VisibilityPolicy memberships that apply to this API (per-product + portal-wide).
+	// OR across groups; AND within a group.
+	// +listType=atomic
+	// +optional
+	Membership []ClaimGroup `json:"membership,omitempty"`
+
+	// allRefsUnresolved indicates that VisibilityPolicy references were declared
+	// for this API but none could be resolved. The backend treats the API as
+	// hidden from non-admin callers when set to true.
+	// +optional
+	AllRefsUnresolved bool `json:"allRefsUnresolved,omitempty"`
 }

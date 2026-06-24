@@ -32,6 +32,7 @@ type PortalPortalInterface interface {
 	PortalsGetter
 	PortalConfigsGetter
 	PortalParametersGetter
+	VisibilityPoliciesGetter
 }
 
 // PortalPortalClient is used to interact with features provided by the portal.solo.io group.
@@ -57,6 +58,10 @@ func (c *PortalPortalClient) PortalConfigs(namespace string) PortalConfigInterfa
 
 func (c *PortalPortalClient) PortalParameters(namespace string) PortalParametersInterface {
 	return newPortalParameters(c, namespace)
+}
+
+func (c *PortalPortalClient) VisibilityPolicies(namespace string) VisibilityPolicyInterface {
+	return newVisibilityPolicies(c, namespace)
 }
 
 // NewForConfig creates a new PortalPortalClient for the given config.
