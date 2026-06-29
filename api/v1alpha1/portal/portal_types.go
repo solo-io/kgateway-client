@@ -1,7 +1,6 @@
 package v1alpha1
 
 import (
-	upstreamshared "github.com/kgateway-dev/kgateway/v2/api/v1alpha1/shared"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
@@ -89,19 +88,37 @@ type PortalSpec struct {
 	// If empty, no API products are exposed.
 	// +listType=atomic
 	// +optional
-	ApiProductRefs []PortalApiProductRef `json:"apiProductRefs,omitempty"` // nolint:kubeapilinter // arrayofstruct - required fields inherited from embedded NamespacedObjectReference
+	ApiProductRefs []PortalApiProductRef `json:"apiProductRefs,omitempty"` // nolint:kubeapilinter // arrayofstruct - PortalApiProductRef has required field Name
 
 	// visibility controls the access requirements for the portal's API catalog.
 	// +optional
 	Visibility *PortalVisibility `json:"visibility,omitempty"`
 }
 
-// PortalApiProductRef references an ApiProduct exposed by the Portal and
-// optionally attaches per-product VisibilityPolicy references
-type PortalApiProductRef struct {
-	upstreamshared.NamespacedObjectReference `json:",inline"`
+// PortalApiProductNamespace is either a Kubernetes namespace name or "*".
+// "*" selects ApiProducts across all namespaces, subject to ReferenceGrant
+// authorization for cross-namespace products.
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=63
+// +kubebuilder:validation:Pattern=`^(\*|[a-z0-9]([-a-z0-9]*[a-z0-9])?)$`
+type PortalApiProductNamespace string
 
-	// visibilityPolicyRefs references VisibilityPolicy resources in the Portal's namespace
+// PortalApiProductRef references ApiProducts exposed by the Portal and
+// optionally attaches per-product VisibilityPolicy references.
+type PortalApiProductRef struct {
+	// name is the ApiProduct name. "*" selects all ApiProducts in the selected
+	// namespace scope.
+	// +required
+	Name gwv1.ObjectName `json:"name"`
+
+	// namespace is the ApiProduct namespace. If omitted, the Portal namespace is
+	// used. "*" selects across all namespaces, with ReferenceGrant still required
+	// for cross-namespace ApiProducts.
+	// +optional
+	Namespace *PortalApiProductNamespace `json:"namespace,omitempty"`
+
+	// visibilityPolicyRefs references VisibilityPolicy resources in the Portal's namespace.
 	// Multiple policies are unioned (OR across policies; OR across each policy's
 	// groups; AND within a group).
 	// +listType=map
