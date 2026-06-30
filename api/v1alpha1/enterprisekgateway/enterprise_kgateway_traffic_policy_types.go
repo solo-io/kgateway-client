@@ -66,6 +66,10 @@ type EnterpriseKgatewayTrafficPolicySpec struct {
 	// EntWAF defines the Web Application Firewall configuration
 	// +optional
 	EntWAF *EntWAF `json:"entWAF,omitempty"`
+
+	// EntDLP defines the Data Loss Prevention configuration
+	// +optional
+	EntDLP *EntDLP `json:"entDLP,omitempty"`
 }
 
 type EntRateLimit struct {
