@@ -47,7 +47,6 @@ type EntTransformation struct {
 
 // TODO(npolshak): Add support for XSLT as part of https://github.com/solo-io/gloo-gateway/issues/106
 // TODO(npolshak): Add support for WrapAsAPIGateway as part of https://github.com/solo-io/gloo-gateway/issues/78
-// TODO(npolshak): Add support for DLP as part of https://github.com/solo-io/gloo-gateway/issues/33
 
 // Transformation defines a transformation that can be applied to requests or responses.
 // +kubebuilder:validation:ExactlyOneOf=template;headerBody
