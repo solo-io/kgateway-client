@@ -10,43 +10,49 @@ import (
 	math "math"
 
 	jsonpb "github.com/golang/protobuf/jsonpb"
-	proto "github.com/golang/protobuf/proto"
+	legacyproto "github.com/golang/protobuf/proto"
+	proto "google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/dynamicpb"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var _ = proto.Marshal
+var _ = legacyproto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+// Marshalling goes through a dynamicpb.Message built from the corrected
+// descriptor (see dynamicMessageFromProto / unmarshalJSON) so the JSON
+// (un)marshaller never reflects over the public *corev1.SecretReference fields,
+// which stopped implementing proto.Message on k8s 1.35+. We deliberately keep
+// jsonpb (not protojson) here to preserve the historical JSON contract these
+// AuthConfig types shipped with: numeric enums, deterministic output, and
+// lenient google.protobuf.Duration parsing via time.ParseDuration (e.g.
+// "50ms", "1h30m"), which protojson rejects. See issue #1995.
 var (
 	marshaller   = &jsonpb.Marshaler{EnumsAsInts: true}
-	unmarshaller = &jsonpb.Unmarshaler{
-		AllowUnknownFields: true,
-	}
+	unmarshaller = &jsonpb.Unmarshaler{AllowUnknownFields: true}
 )
 
 // MarshalJSON is a custom marshaler for AuthConfigSpec
 func (this *AuthConfigSpec) MarshalJSON() ([]byte, error) {
-	str, err := marshaller.MarshalToString(this)
-	return []byte(str), err
+	return marshalJSON(this)
 }
 
 // UnmarshalJSON is a custom unmarshaler for AuthConfigSpec
 func (this *AuthConfigSpec) UnmarshalJSON(b []byte) error {
-	return unmarshaller.Unmarshal(bytes.NewReader(b), this)
+	return unmarshalJSON(b, this)
 }
 
 // MarshalJSON is a custom marshaler for AuthConfigStatus
 func (this *AuthConfigStatus) MarshalJSON() ([]byte, error) {
-	str, err := marshaller.MarshalToString(this)
-	return []byte(str), err
+	return marshalJSON(this)
 }
 
 // UnmarshalJSON is a custom unmarshaler for AuthConfigStatus
 func (this *AuthConfigStatus) UnmarshalJSON(b []byte) error {
 	namespacedStatuses := AuthConfigNamespacedStatuses{}
-	if err := unmarshaller.Unmarshal(bytes.NewReader(b), &namespacedStatuses); err != nil {
-		return unmarshaller.Unmarshal(bytes.NewReader(b), this)
+	if err := unmarshalJSON(b, &namespacedStatuses); err != nil {
+		return unmarshalJSON(b, this)
 	}
 
 	for _, status := range namespacedStatuses.GetStatuses() {
@@ -57,4 +63,56 @@ func (this *AuthConfigStatus) UnmarshalJSON(b []byte) error {
 		}
 	}
 	return nil
+}
+
+func marshalJSON(message proto.Message) ([]byte, error) {
+	dynamicMessage, err := dynamicMessageFromProto(message)
+	if err != nil {
+		return nil, err
+	}
+	str, err := marshaller.MarshalToString(legacyproto.MessageV1(dynamicMessage))
+	if err != nil {
+		return nil, err
+	}
+	return []byte(str), nil
+}
+
+func unmarshalJSON(b []byte, message proto.Message) error {
+	dynamicMessage := dynamicpb.NewMessage(message.ProtoReflect().Descriptor())
+	if err := unmarshaller.Unmarshal(bytes.NewReader(b), legacyproto.MessageV1(dynamicMessage)); err != nil {
+		return err
+	}
+
+	wireBytes, err := proto.Marshal(dynamicMessage)
+	if err != nil {
+		return err
+	}
+
+	legacyMessage, ok := message.(legacyproto.Message)
+	if !ok {
+		return fmt.Errorf("%T does not implement legacy proto.Message", message)
+	}
+	return legacyproto.Unmarshal(wireBytes, legacyMessage)
+}
+
+func dynamicMessageFromProto(message proto.Message) (*dynamicpb.Message, error) {
+	dynamicMessage := dynamicpb.NewMessage(message.ProtoReflect().Descriptor())
+
+	legacyMessage, ok := message.(legacyproto.Message)
+	if !ok {
+		return nil, fmt.Errorf("%T does not implement legacy proto.Message", message)
+	}
+
+	wireBytes, err := legacyproto.Marshal(legacyMessage)
+	if err != nil {
+		return nil, err
+	}
+	if len(wireBytes) == 0 {
+		return dynamicMessage, nil
+	}
+	if err := proto.Unmarshal(wireBytes, dynamicMessage); err != nil {
+		return nil, err
+	}
+
+	return dynamicMessage, nil
 }
