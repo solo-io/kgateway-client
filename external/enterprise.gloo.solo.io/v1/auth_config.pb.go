@@ -7,6 +7,7 @@
 package v1
 
 import (
+	core "github.com/solo-io/kgateway-client/v2/external/enterprise.gloo.solo.io/v1/core"
 	_ "github.com/solo-io/protoc-gen-ext/extproto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -8776,7 +8777,7 @@ var file_github_com_solo_io_solo_apis_api_gloo_enterprise_gloo_v1_auth_config_pr
 	nil,                                      // 116: enterprise.gloo.solo.io.AuthConfigStatus.SubresourceStatusesEntry
 	nil,                                      // 117: enterprise.gloo.solo.io.AuthConfigNamespacedStatuses.StatusesEntry
 	(*wrapperspb.StringValue)(nil),           // 118: google.protobuf.StringValue
-	(*v1.SecretReference)(nil),                 // 119: core.solo.io.ResourceRef
+	(*core.ResourceRef)(nil),                 // 119: core.solo.io.ResourceRef
 	(*durationpb.Duration)(nil),              // 120: google.protobuf.Duration
 	(*structpb.Struct)(nil),                  // 121: google.protobuf.Struct
 	(*wrapperspb.BoolValue)(nil),             // 122: google.protobuf.BoolValue

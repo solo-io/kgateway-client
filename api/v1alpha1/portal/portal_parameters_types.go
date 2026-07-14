@@ -34,6 +34,8 @@ type PortalParameters struct {
 }
 
 // PortalParametersSpec defines the desired operational configuration for a Portal deployment.
+//
+// +kubebuilder:validation:XValidation:rule="!has(self.portalAuthServer) || (has(self.store) && has(self.store.postgres))",message="portalAuthServer requires spec.store.postgres; portalAuthServer is only supported with a postgres store"
 type PortalParametersSpec struct {
 	// store configures the data store for the portal backend.
 	// Exactly one store type must be specified. If omitted, defaults to in-memory.
@@ -43,6 +45,15 @@ type PortalParametersSpec struct {
 	// webServer configures the portal web server deployment.
 	// +optional
 	WebServer *PortalWebServer `json:"webServer,omitempty"`
+
+	// portalAuthServer configures the portal auth server deployment, which serves the
+	// data-plane /v1/metadata endpoint that ExtAuth calls to validate API keys and
+	// OAuth tokens. The portal auth server is opt-in: when this block is omitted, no
+	// dedicated Deployment is rendered and ExtAuth continues to call /v1/metadata on
+	// the portal web server (existing behavior). To enable, set this block — its
+	// presence is the opt-in signal.
+	// +optional
+	PortalAuthServer *PortalAuthServer `json:"portalAuthServer,omitempty"`
 
 	// idpServerURL is the URL of an Identity Provider SPI server for OAuth client management.
 	// When set, OAuth credential create/delete operations are delegated to this external server
@@ -86,6 +97,49 @@ type PortalWebServerContainer struct {
 	// independently; unset fields retain the chart defaults.
 	// +optional
 	Image *upstream.Image `json:"image,omitempty"`
+}
+
+// PortalAuthServer configures the portal auth server deployment. The portal auth
+// server serves the data-plane /v1/metadata endpoint for ExtAuth credential
+// validation. It runs the same image as the portal web server with --role=portal-auth,
+// which skips the migrator, the Portal/ApiDoc informers, and all admin routes.
+//
+// Running this as a separate Deployment isolates the high-QPS data plane from
+// admin CRUD traffic — independent scaling, independent fault domain, independent
+// DB connection pool.
+type PortalAuthServer struct {
+	// replicas is the number of portal auth server pods.
+	// If omitted, defaults to 1. If using an HPA, do not set this field.
+	// +kubebuilder:validation:Minimum=0
+	// +optional
+	Replicas *int32 `json:"replicas,omitempty"`
+
+	// resources configures CPU and memory requests/limits for the portal auth server container.
+	// +optional
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+
+	// container configures the portal auth server container. The image is shared
+	// with the portal web server; this field exists to allow per-role image overrides
+	// (for example, pinning the auth server to a specific tag during a rolling upgrade).
+	// +optional
+	Container *PortalWebServerContainer `json:"container,omitempty"`
+
+	// LogLevel sets the log level for the portal auth server process. One of:
+	// "error", "warn", "info", "debug", "trace". When unset, the binary's
+	// default level (info) is used.
+	// +kubebuilder:validation:Enum=error;warn;info;debug;trace
+	// +optional
+	LogLevel *string `json:"logLevel,omitempty"`
+
+	// postgres configures the postgres connection for the portal auth server.
+	// When unset, the portal auth server uses spec.store.postgres for the database config.
+	// +optional
+	Postgres *PostgresStoreConfig `json:"postgres,omitempty"`
+
+	// GatewayParametersOverlays contains overlay fields for portal auth server resources.
+	// These allow applying strategic merge patches and creating HPA/PDB/VPA resources
+	// scoped to the portal auth Deployment only.
+	upstream.GatewayParametersOverlays `json:",inline"`
 }
 
 // StoreConfig configures the data store for the portal backend.
