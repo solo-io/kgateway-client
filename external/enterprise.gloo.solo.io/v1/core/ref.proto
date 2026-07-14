@@ -1,0 +1,23 @@
+// Vendored from https://github.com/solo-io/solo-kit/blob/v0.41.0/api/v1/ref.proto
+//
+// The repo-local go_package is set to this directory so the generated
+// ref.pb.go satisfies proto reflection for `core.solo.io.ResourceRef`
+// without pulling solo-kit (and its transitive deps) into go.mod. See
+// external/enterprise.gloo.solo.io/README.md and gloo-gateway issue #330
+// for context.
+//
+// The upstream proto carries extproto (Hash/Equal/Clone) options. We omit
+// them here because (a) nothing in this repo calls those methods on
+// ResourceRef and (b) the tools/go.mod proto generator only has
+// protoc-gen-go available, not protoc-gen-ext.
+syntax = "proto3";
+
+package core.solo.io;
+
+option go_package = "github.com/solo-io/gloo-gateway/v2/external/enterprise.gloo.solo.io/v1/core";
+
+// A way to reference resources across namespaces
+message ResourceRef {
+    string name = 1;
+    string namespace = 2;
+}

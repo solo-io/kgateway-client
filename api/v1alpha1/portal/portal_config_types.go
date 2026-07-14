@@ -67,6 +67,10 @@ type PortalAPI struct {
 	// +required
 	APIProductDisplayName string `json:"apiProductDisplayName"`
 
+	// apiProductDescription is the product-level description from ApiProduct.spec.description
+	// +optional
+	APIProductDescription *string `json:"apiProductDescription,omitempty"`
+
 	// apiVersion is the version string (e.g., "v1", "v2")
 	// +kubebuilder:validation:MinLength=1
 	// +required
@@ -84,7 +88,9 @@ type PortalAPI struct {
 	// +optional
 	TermsOfService *string `json:"termsOfService,omitempty"`
 
-	// contact from OpenAPI metadata
+	// contact is the product-level contact email from ApiProduct.spec.contactEmail.
+	// Despite the generic field name, this carries the product contactEmail (not the
+	// version's OpenAPI contact, which feeds the stitched spec's info.contact separately).
 	// +optional
 	Contact *string `json:"contact,omitempty"`
 
