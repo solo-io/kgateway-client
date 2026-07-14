@@ -70,6 +70,10 @@ type EnterpriseKgatewayTrafficPolicySpec struct {
 	// EntDLP defines the Data Loss Prevention configuration
 	// +optional
 	EntDLP *EntDLP `json:"entDLP,omitempty"`
+
+	// EntGrpcJsonTranscoder configures HTTP/JSON-to-gRPC transcoding for the targeted routes.
+	// +optional
+	EntGrpcJsonTranscoder *EntGrpcJsonTranscoder `json:"entGrpcJsonTranscoder,omitempty"`
 }
 
 type EntRateLimit struct {
