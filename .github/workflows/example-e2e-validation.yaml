@@ -109,7 +109,7 @@ jobs:
             echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
             exit 0
           fi
-          mention="${SLACK_NOTIFY_MENTION:-@gateway-on-call}"
+          mention="${SLACK_NOTIFY_MENTION:-<!subteam^S01KPUH3TJ5|@gateway-on-call>}"
           export SLACK_MESSAGE="${mention} tag sync e2e validation failed for ${TAG_REF}.
 
           validate-examples-e2e=${E2E_RESULT}
