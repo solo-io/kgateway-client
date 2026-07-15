@@ -119,7 +119,7 @@ jobs:
             echo "SLACK_WEBHOOK_URL is not configured; skipping notification"
             exit 0
           fi
-          mention="${SLACK_NOTIFY_MENTION:-@Daneyon Hansen}"
+          mention="${SLACK_NOTIFY_MENTION:-@gateway-on-call}"
           export SLACK_MESSAGE="${mention} main sync PR #${PR_NUMBER} did not auto-merge.
 
           merge-sync-pr=${MERGE_RESULT}

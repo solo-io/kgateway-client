@@ -90,7 +90,7 @@ Required repo configuration:
 
 - Variable: `SYNC_APP_ID`
 - Variable: `SYNC_PR_AUTHOR_LOGIN`
-- Variable: `SLACK_NOTIFY_MENTION` (optional; defaults to `@Daneyon Hansen`)
+- Variable: `SLACK_NOTIFY_MENTION` (optional; defaults to `@gateway-on-call`)
 - Secret: `SYNC_APP_PRIVATE_KEY`
 - Secret: `SLACK_WEBHOOK_URL` (for failure notifications)
 
