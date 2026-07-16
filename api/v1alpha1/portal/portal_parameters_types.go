@@ -60,6 +60,42 @@ type PortalParametersSpec struct {
 	// (e.g., Keycloak via gloo-portal-idp-connect). When omitted, oauth endpoint will return a 500.
 	// +optional
 	IdpServerURL *string `json:"idpServerURL,omitempty"`
+
+	// adminAuth configures how Portal admin privileges are derived from a caller's JWT claims.
+	// When omitted, a user is an admin if the JWT's "groups" claim contains "admin".
+	// +optional
+	AdminAuth *AdminAuthConfig `json:"adminAuth,omitempty"`
+}
+
+const (
+	// DefaultAdminGroupClaim is the default JWT claim the portal web server reads group
+	// membership from when AdminAuthConfig.GroupClaim is unset.
+	DefaultAdminGroupClaim = "groups"
+
+	// DefaultAdminGroup is the default group value that grants Portal admin when
+	// AdminAuthConfig.AdminGroups is unset.
+	DefaultAdminGroup = "admin"
+)
+
+// AdminAuthConfig configures admin-group mapping for the portal web server. Admin status is
+// derived from the caller's validated JWT. The web server reads the configured claim and grants
+// admin when it contains any of the configured group values.
+type AdminAuthConfig struct {
+	// groupClaim is the JWT claim to read group membership from. Defaults to "groups".
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	GroupClaim *string `json:"groupClaim,omitempty"`
+
+	// adminGroups are the group values that grant Portal admin. A caller is an admin when the
+	// groupClaim contains any of these values, compared as an exact, case-sensitive match.
+	// Defaults to ["admin"].
+	// +kubebuilder:validation:MaxItems=32
+	// +kubebuilder:validation:items:MinLength=1
+	// +kubebuilder:validation:items:MaxLength=253
+	// +listType=atomic
+	// +optional
+	AdminGroups []string `json:"adminGroups,omitempty"`
 }
 
 // PortalWebServer configures the portal web server deployment.
