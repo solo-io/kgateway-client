@@ -35,7 +35,7 @@ type PortalParameters struct {
 
 // PortalParametersSpec defines the desired operational configuration for a Portal deployment.
 //
-// +kubebuilder:validation:XValidation:rule="!has(self.portalAuthServer) || (has(self.store) && has(self.store.postgres))",message="portalAuthServer requires spec.store.postgres; portalAuthServer is only supported with a postgres store"
+// +kubebuilder:validation:XValidation:rule="!has(self.authServer) || (has(self.store) && has(self.store.postgres))",message="authServer requires spec.store.postgres; authServer is only supported with a postgres store"
 type PortalParametersSpec struct {
 	// store configures the data store for the portal backend.
 	// Exactly one store type must be specified. If omitted, defaults to in-memory.
@@ -46,14 +46,14 @@ type PortalParametersSpec struct {
 	// +optional
 	WebServer *PortalWebServer `json:"webServer,omitempty"`
 
-	// portalAuthServer configures the portal auth server deployment, which serves the
+	// authServer configures the portal auth server deployment, which serves the
 	// data-plane /v1/metadata endpoint that ExtAuth calls to validate API keys and
 	// OAuth tokens. The portal auth server is opt-in: when this block is omitted, no
 	// dedicated Deployment is rendered and ExtAuth continues to call /v1/metadata on
 	// the portal web server (existing behavior). To enable, set this block — its
 	// presence is the opt-in signal.
 	// +optional
-	PortalAuthServer *PortalAuthServer `json:"portalAuthServer,omitempty"`
+	AuthServer *PortalAuthServer `json:"authServer,omitempty"`
 
 	// idpServerURL is the URL of an Identity Provider SPI server for OAuth client management.
 	// When set, OAuth credential create/delete operations are delegated to this external server

@@ -957,8 +957,8 @@ func (in *PortalParametersSpec) DeepCopyInto(out *PortalParametersSpec) {
 		*out = new(PortalWebServer)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.PortalAuthServer != nil {
-		in, out := &in.PortalAuthServer, &out.PortalAuthServer
+	if in.AuthServer != nil {
+		in, out := &in.AuthServer, &out.AuthServer
 		*out = new(PortalAuthServer)
 		(*in).DeepCopyInto(*out)
 	}
