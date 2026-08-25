@@ -364,6 +364,14 @@ func (m *RateLimit) Equal(that interface{}) bool {
 		return false
 	}
 
+	if m.GetLimitType() != target.GetLimitType() {
+		return false
+	}
+
+	if m.GetRequestsPerUnit_64() != target.GetRequestsPerUnit_64() {
+		return false
+	}
+
 	return true
 }
 

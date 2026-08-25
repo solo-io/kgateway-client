@@ -376,6 +376,16 @@ func (m *RateLimit) Hash(hasher hash.Hash64) (uint64, error) {
 		return 0, err
 	}
 
+	err = binary.Write(hasher, binary.LittleEndian, m.GetLimitType())
+	if err != nil {
+		return 0, err
+	}
+
+	err = binary.Write(hasher, binary.LittleEndian, m.GetRequestsPerUnit_64())
+	if err != nil {
+		return 0, err
+	}
+
 	return hasher.Sum64(), nil
 }
 
