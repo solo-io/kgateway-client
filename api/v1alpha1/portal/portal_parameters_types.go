@@ -65,6 +65,16 @@ type PortalParametersSpec struct {
 	// When omitted, a user is an admin if the JWT's "groups" claim contains "admin".
 	// +optional
 	AdminAuth *AdminAuthConfig `json:"adminAuth,omitempty"`
+
+	// omitDefaultSecurityContext suppresses the default pod- and container-level
+	// securityContext on both Deployments this Portal provisions — the web
+	// server and, when enabled, the auth server. Set it on platforms that assign
+	// a securityContext themselves, such as OpenShift, where the defaults' UID
+	// 10101 falls outside the namespace's allowed SCC range. A podSecurityContext
+	// or container.securityContext set explicitly on a role is still rendered.
+	//
+	// +optional
+	OmitDefaultSecurityContext *bool `json:"omitDefaultSecurityContext,omitempty"`
 }
 
 const (
@@ -114,6 +124,10 @@ type PortalWebServer struct {
 	// +optional
 	Container *PortalWebServerContainer `json:"container,omitempty"`
 
+	// pod configures the portal pod.
+	// +optional
+	Pod *PortalPod `json:"pod,omitempty"`
+
 	// LogLevel sets the log level for the portal web server process. One of:
 	// "error", "warn", "info", "debug", "trace". When unset, the binary's
 	// default level (info) is used.
@@ -126,6 +140,19 @@ type PortalWebServer struct {
 	upstream.GatewayParametersOverlays `json:",inline"`
 }
 
+// PortalPod configures a portal pod. It uses the same pod.securityContext path
+// as EKP's extensions but is portal-owned rather than upstream.Pod, whose other
+// fields the portal deployer does not implement — among them a startupProbe
+// that would contend with the chart's migration gate.
+type PortalPod struct {
+	// securityContext is merged over the default pod-level securityContext field
+	// by field, so setting one field keeps the defaults for the rest. Nested
+	// blocks and lists are replaced rather than merged. A deploymentOverlay is
+	// applied after this and still wins.
+	// +optional
+	SecurityContext *corev1.PodSecurityContext `json:"securityContext,omitempty"`
+}
+
 // PortalWebServerContainer configures the portal web server container.
 type PortalWebServerContainer struct {
 	// image overrides the portal web server container image.
@@ -133,6 +160,13 @@ type PortalWebServerContainer struct {
 	// independently; unset fields retain the chart defaults.
 	// +optional
 	Image *upstream.Image `json:"image,omitempty"`
+
+	// securityContext is merged over the default container-level securityContext
+	// field by field, so setting one field keeps the defaults for the rest.
+	// Nested blocks merge, and capabilities lists are additive: a default entry
+	// cannot be removed here, only via omitDefaultSecurityContext.
+	// +optional
+	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 }
 
 // PortalAuthServer configures the portal auth server deployment. The portal auth
@@ -159,6 +193,10 @@ type PortalAuthServer struct {
 	// (for example, pinning the auth server to a specific tag during a rolling upgrade).
 	// +optional
 	Container *PortalWebServerContainer `json:"container,omitempty"`
+
+	// pod configures the portal pod.
+	// +optional
+	Pod *PortalPod `json:"pod,omitempty"`
 
 	// LogLevel sets the log level for the portal auth server process. One of:
 	// "error", "warn", "info", "debug", "trace". When unset, the binary's
