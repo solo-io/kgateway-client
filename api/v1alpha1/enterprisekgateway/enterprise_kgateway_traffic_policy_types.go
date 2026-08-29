@@ -74,6 +74,10 @@ type EnterpriseKgatewayTrafficPolicySpec struct {
 	// EntGrpcJsonTranscoder configures HTTP/JSON-to-gRPC transcoding for the targeted routes.
 	// +optional
 	EntGrpcJsonTranscoder *EntGrpcJsonTranscoder `json:"entGrpcJsonTranscoder,omitempty"`
+
+	// EntHeaderSanitization removes HTTP headers that are not permitted by the configured rules.
+	// +optional
+	EntHeaderSanitization *EntHeaderSanitization `json:"entHeaderSanitization,omitempty"`
 }
 
 type EntRateLimit struct {
