@@ -30,40 +30,6 @@ type EntHeaderSanitization struct {
 	// toward the client. Response trailers are not affected.
 	// +optional
 	Response *HeaderSanitizationRules `json:"response,omitempty"`
-
-	// FilterStage controls where in the HTTP filter chain sanitization runs.
-	// Defaults to `{stage: Fault, predicate: Before}`.
-	//
-	// Envoy runs HTTP filters in order on the request path and in reverse order
-	// on the response path, so the stage determines what else observes the
-	// removed headers:
-	//
-	//   - `{stage: Route, predicate: After}` places the filter closest to the
-	//     upstream, so it sanitizes as soon as the response arrives and no later
-	//     filter in the HTTP connection manager chain sees the removed headers.
-	//   - `{stage: Fault, predicate: Before}` (the default) places the filter
-	//     closest to the client, so every other filter in that chain still sees
-	//     the full header set but the client does not.
-	//
-	// `Before` and `After` are absolute within their stage: `Before` places this
-	// filter ahead of every other filter at that stage and `After` places it
-	// behind every one of them, rather than merely adjacent to the stage. So
-	// `{stage: Route, predicate: After}` also runs ahead of, say,
-	// `entTransformation`'s postRouting stage on the response path, even though
-	// both resolve to the same stage.
-	//
-	// Both placements are in the HTTP connection manager chain. Filters in the
-	// router's upstream HTTP filter chain run closer to the upstream than the
-	// router itself, so on the response path they run before either placement
-	// and always observe the full, unsanitized header set. An ext_proc whose own
-	// filter stage is after route runs there, for example. Use this policy to
-	// control what reaches the client and the rest of the HTTP connection
-	// manager chain, not to hide headers from every other filter.
-	//
-	// Policies that resolve to different stages each get their own filter
-	// instance, so several may be active on one route or gateway at once.
-	// +optional
-	FilterStage *upstream.FilterStageSpec `json:"filterStage,omitempty"`
 }
 
 // HeaderSanitizationRules selects which headers survive sanitization.
@@ -102,4 +68,45 @@ type HeaderSanitizationRules struct {
 	// +kubebuilder:validation:MaxItems=256
 	// +kubebuilder:listType=set
 	Allowlist []gwv1.HTTPHeaderName `json:"allowlist,omitempty"`
+
+	// FilterStage controls where in the HTTP filter chain this direction's
+	// sanitization runs. Defaults to `{stage: Fault, predicate: Before}`.
+	//
+	// The stage belongs to the direction rather than to the policy as a whole so
+	// that one policy can sanitize each direction at a different point in the
+	// chain -- a request allowlist at Fault and a response allowlist at Route,
+	// say. A policy-wide stage would force that across two policies, and a
+	// shallow merge strategy resolves two such policies by discarding one of
+	// them outright.
+	//
+	// Directions that resolve to the same stage share one filter instance;
+	// directions at different stages each get their own.
+	//
+	// Envoy runs HTTP filters in order on the request path and in reverse order
+	// on the response path, so for the response direction the stage determines
+	// what else observes the removed headers:
+	//
+	//   - `{stage: Route, predicate: After}` places the filter closest to the
+	//     upstream, so it sanitizes as soon as the response arrives and no later
+	//     filter in the HTTP connection manager chain sees the removed headers.
+	//   - `{stage: Fault, predicate: Before}` (the default) places the filter
+	//     closest to the client, so every other filter in that chain still sees
+	//     the full header set but the client does not.
+	//
+	// `Before` and `After` are absolute within their stage: `Before` places this
+	// filter ahead of every other filter at that stage and `After` places it
+	// behind every one of them, rather than merely adjacent to the stage. So
+	// `{stage: Route, predicate: After}` also runs ahead of, say,
+	// `entTransformation`'s postRouting stage on the response path, even though
+	// both resolve to the same stage.
+	//
+	// Both placements are in the HTTP connection manager chain. Filters in the
+	// router's upstream HTTP filter chain run closer to the upstream than the
+	// router itself, so on the response path they run before either placement
+	// and always observe the full, unsanitized header set. An ext_proc whose own
+	// filter stage is after route runs there, for example. Use this policy to
+	// control what reaches the client and the rest of the HTTP connection
+	// manager chain, not to hide headers from every other filter.
+	// +optional
+	FilterStage *upstream.FilterStageSpec `json:"filterStage,omitempty"`
 }
