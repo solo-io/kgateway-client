@@ -75,6 +75,7 @@ type EnterpriseKgatewayTrafficPolicySpec struct {
 	// +optional
 	EntGrpcJsonTranscoder *EntGrpcJsonTranscoder `json:"entGrpcJsonTranscoder,omitempty"`
 
+	// Note: This struct is part of an experimental API and subject to breaking changes in future releases.
 	// EntHeaderSanitization removes HTTP headers that are not permitted by the configured rules.
 	// +optional
 	EntHeaderSanitization *EntHeaderSanitization `json:"entHeaderSanitization,omitempty"`
