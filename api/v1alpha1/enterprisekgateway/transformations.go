@@ -511,6 +511,18 @@ type AWSLambdaTransformation struct {
 	RequestFormat *AWSLambdaTransformFormat `json:"requestFormat,omitempty"`
 
 	// ResponseFormat defines the format to transform responses from AWS Lambda functions.
+	//
+	// The transformation is only applied to a response from a successful invocation,
+	// whose body carries the APIGateway envelope. A Lambda service-level failure - a
+	// SigV4 rejection, a missing function or a service error - carries no envelope and
+	// is not the client's error, so rather than being unwrapped or passed through it is
+	// reported the way API Gateway reports a failure to invoke: a 500 with an opaque
+	// `{"message": "Internal server error"}` body and a generic
+	// `x-amzn-errortype: InternalServerErrorException`. The real upstream status and
+	// AWS exception name are recorded in dynamic metadata, as `statuscode` and
+	// `statusreason` in the `io.solo.aws_lambda` namespace, for use in the access log;
+	// the cluster's upstream_rq_<code> stats are unaffected. A Lambda-level throttle is
+	// reported as a 500 with an `x-envoygloo-lambda-statuscode: 429` header.
 	// +optional
 	ResponseFormat *AWSLambdaTransformFormat `json:"responseFormat,omitempty"`
 }
