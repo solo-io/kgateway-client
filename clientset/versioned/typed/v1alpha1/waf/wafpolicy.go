@@ -20,8 +20,8 @@ package waf
 import (
 	context "context"
 
-	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	v1alpha1waf "github.com/solo-io/kgateway-client/v2/api/v1alpha1/waf"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

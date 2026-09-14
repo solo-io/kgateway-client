@@ -20,8 +20,8 @@ package waf
 import (
 	http "net/http"
 
-	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	v1alpha1waf "github.com/solo-io/kgateway-client/v2/api/v1alpha1/waf"
+	scheme "github.com/solo-io/kgateway-client/v2/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 

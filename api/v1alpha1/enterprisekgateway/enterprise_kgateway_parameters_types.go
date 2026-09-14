@@ -16,9 +16,8 @@ import (
 // and enterprise ExtAuth and RateLimiter extensions
 // +genclient
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:categories={enterprisekgateway,ekgw},path=enterprisekgatewayparameters,shortName=ekgpar
+// +kubebuilder:resource:categories={enterprisekgateway,ekgw},path=enterprisekgatewayparameters
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Accepted",type="string",JSONPath=".status.conditions[?(@.type=='Accepted')].status"
 // +kubebuilder:metadata:labels={app=enterprisekgateway,app.kubernetes.io/name=enterprisekgatewayparameters}
 type EnterpriseKgatewayParameters struct {
 	metav1.TypeMeta `json:",inline"`
@@ -108,28 +107,7 @@ type EnterpriseKgatewayKubernetesProxyConfig struct {
 	SharedExtensions *Extensions `json:"sharedExtensions,omitempty"`
 }
 
-const (
-	// EnterpriseKgatewayParametersConditionAccepted reports whether this control plane
-	// accepted the parameters.
-	EnterpriseKgatewayParametersConditionAccepted = "Accepted"
-
-	// EnterpriseKgatewayParametersReasonAccepted is the Accepted condition's
-	// reason when the parameters are usable by this control plane.
-	EnterpriseKgatewayParametersReasonAccepted = "Accepted"
-)
-
-// EnterpriseKgatewayParametersStatus reports whether this control plane
-// accepted the parameters.
-type EnterpriseKgatewayParametersStatus struct {
-	// conditions represent the current state of the parameters. The only
-	// condition type is "Accepted".
-	// +listType=map
-	// +listMapKey=type
-	// +patchStrategy=merge
-	// +patchMergeKey=type
-	// +optional
-	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
-}
+type EnterpriseKgatewayParametersStatus struct{}
 
 // EnterpriseKgatewayParametersList is a list of EnterpriseKgatewayParameters resources
 // +k8s:openapi-gen=true
