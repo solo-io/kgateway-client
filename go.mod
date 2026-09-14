@@ -4,7 +4,7 @@ go 1.26.7
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/kgateway-dev/kgateway/v2 v2.4.0-rc.1.0.20260910204959-0c54ab72b5d3
+	github.com/kgateway-dev/kgateway/v2 v2.4.5-0.20260911070248-6c443fcf843b
 	github.com/solo-io/protoc-gen-ext v0.1.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
