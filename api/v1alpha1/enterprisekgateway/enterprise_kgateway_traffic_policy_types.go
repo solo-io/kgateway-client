@@ -135,7 +135,6 @@ type EntExtAuth struct {
 
 // +kubebuilder:validation:ExactlyOneOf=wafPolicyRef;disable
 // +kubebuilder:validation:AtMostOneOf=wafServerRef;disable
-// +kubebuilder:validation:AtMostOneOf=serverConfig;disable
 type EntWAF struct {
 	// WAFPolicyRef references the WAFPolicy we want to use for the traffic policy
 	// +optional
@@ -148,24 +147,8 @@ type EntWAF struct {
 	// +optional
 	WAFServerRef *gwv1.BackendObjectReference `json:"wafServerRef,omitempty"`
 
-	// ServerConfig configures communication with the WAF server.
-	// +optional
-	ServerConfig *WAFServerConfig `json:"serverConfig,omitempty"`
-
 	// Disable WAF.
 	// Can be used to disable WAF policies applied at a higher level in the config hierarchy.
 	// +optional
 	Disable *upstreamshared.PolicyDisable `json:"disable,omitempty"`
-}
-
-// WAFServerConfig configures communication with the WAF server.
-type WAFServerConfig struct {
-	// MessageTimeout is the timeout for each message sent to the WAF server.
-	// If not set, Envoy's default per-message timeout of 200ms is used.
-	// +optional
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:MaxLength=32
-	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9]{1,5}(h|m|s|ms)){1,4}$')",message="invalid timeout value"
-	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('1ms')",message="timeout must be at least 1ms."
-	MessageTimeout *metav1.Duration `json:"messageTimeout,omitempty"`
 }
