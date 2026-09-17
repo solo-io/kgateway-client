@@ -17,6 +17,8 @@ limitations under the License.
 
 package enterprisekgateway
 
+type EnterpriseKgatewayDestinationSelectorExpansion interface{}
+
 type EnterpriseKgatewayParametersExpansion interface{}
 
 type EnterpriseKgatewayTrafficPolicyExpansion interface{}

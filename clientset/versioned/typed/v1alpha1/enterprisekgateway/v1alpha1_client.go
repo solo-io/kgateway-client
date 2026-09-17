@@ -27,6 +27,7 @@ import (
 
 type EnterprisekgatewayEnterprisekgatewayInterface interface {
 	RESTClient() rest.Interface
+	EnterpriseKgatewayDestinationSelectorsGetter
 	EnterpriseKgatewayParametersGetter
 	EnterpriseKgatewayTrafficPoliciesGetter
 }
@@ -34,6 +35,10 @@ type EnterprisekgatewayEnterprisekgatewayInterface interface {
 // EnterprisekgatewayEnterprisekgatewayClient is used to interact with features provided by the enterprisekgateway.solo.io group.
 type EnterprisekgatewayEnterprisekgatewayClient struct {
 	restClient rest.Interface
+}
+
+func (c *EnterprisekgatewayEnterprisekgatewayClient) EnterpriseKgatewayDestinationSelectors(namespace string) EnterpriseKgatewayDestinationSelectorInterface {
+	return newEnterpriseKgatewayDestinationSelectors(c, namespace)
 }
 
 func (c *EnterprisekgatewayEnterprisekgatewayClient) EnterpriseKgatewayParameters(namespace string) EnterpriseKgatewayParametersInterface {
