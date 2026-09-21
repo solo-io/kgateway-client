@@ -195,6 +195,24 @@ type ApiDocStatus struct {
 	// that has been normalized to OpenAPI 3.x JSON.
 	// +optional
 	ResolvedSchema *string `json:"resolvedSchema,omitempty"`
+
+	// sourceOpenApiVersion is the version the source document declared, reported
+	// verbatim. The swagger field for Swagger 2.0 documents, the openapi field
+	// otherwise. Unset when the document declares neither.
+	// +optional
+	SourceOpenApiVersion *string `json:"sourceOpenApiVersion,omitempty"`
+
+	// resolvedOpenApiVersion is the OpenAPI version status.resolvedSchema declares.
+	// It is the target set by the installation's configured maximum OpenAPI version,
+	// and differs from sourceOpenApiVersion when the document was converted up to
+	// that target. On a generated stitched ApiDoc it is the version the ApiProduct
+	// version emits.
+	//
+	// A document declaring a higher minor line is rejected and reports only
+	// sourceOpenApiVersion. After the maximum is lowered, an ApiDoc reports the
+	// previous target until its next fetch completes.
+	// +optional
+	ResolvedOpenApiVersion *string `json:"resolvedOpenApiVersion,omitempty"`
 }
 
 // ApiDocList contains a list of ApiDoc resources.
