@@ -108,8 +108,37 @@ type AdminAuthConfig struct {
 	AdminGroups []string `json:"adminGroups,omitempty"`
 }
 
+// GoRuntimeConfiguration tunes the Go runtime for a portal server.
+// GOMAXPROCS is container-aware by default and does not require a corresponding
+// setting here.
+type GoRuntimeConfiguration struct {
+	// GoMemLimitPercent sets GOMEMLIMIT as a percentage of resources.limits.memory.
+	// The effective default is 100. Omission and an explicit 100 have the same behavior:
+	// when a memory limit is configured, GOMEMLIMIT uses resourceFieldRef to read the
+	// full container limit at startup, including admission-time changes. Without a
+	// configured memory limit, no GOMEMLIMIT is generated, even if an overlay or
+	// admission later adds a limit. This avoids using node allocatable memory as the
+	// default Go budget.
+	// Values from 1 to 99 require a configured memory limit and are calculated before
+	// deployment overlays are applied. Overlays can override the generated value.
+	// Environment variables do not follow in-place Pod resizes. A VPA can make a
+	// fixed percentage value stale; at 100, only in-place resizing makes it stale.
+	// A stale value after a memory decrease can increase OOM risk; after an increase,
+	// it can cause unnecessarily frequent garbage collection.
+	// 90 is recommended when additional OOM headroom is needed; a lower value such
+	// as 80 may be appropriate for significant memory use outside the Go runtime.
+	// Zero is not valid; omit this field to use the default behavior.
+	//
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=100
+	// +optional
+	GoMemLimitPercent *int32 `json:"goMemLimitPercent,omitempty"`
+}
+
 // PortalWebServer configures the portal web server deployment.
 type PortalWebServer struct {
+	GoRuntimeConfiguration `json:",inline"`
+
 	// replicas is the number of portal web server pods.
 	// If omitted, defaults to 1. If using an HPA, do not set this field.
 	// +kubebuilder:validation:Minimum=0
@@ -178,6 +207,8 @@ type PortalWebServerContainer struct {
 // admin CRUD traffic — independent scaling, independent fault domain, independent
 // DB connection pool.
 type PortalAuthServer struct {
+	GoRuntimeConfiguration `json:",inline"`
+
 	// replicas is the number of portal auth server pods.
 	// If omitted, defaults to 1. If using an HPA, do not set this field.
 	// +kubebuilder:validation:Minimum=0
