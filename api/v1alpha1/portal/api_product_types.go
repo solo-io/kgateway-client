@@ -59,13 +59,13 @@ type ApiProductSpec struct {
 	// contactEmail is the email address to surface in the frontend portal for questions
 	// about this API product.
 	//
-	// The Pattern below is based on the WHATWG HTML5 <input type=email> validation regex
-	// (https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address), with three
-	// deliberate deviations: the backtick is omitted from the local part so the pattern can
-	// be backtick-delimited here; the domain-label group uses + instead of * to require a
-	// dotted domain (e.g. user@host alone is rejected); and the local part is a dot-atom
-	// (dot-separated, no leading/trailing/consecutive dots) so admission matches the
-	// stricter mail.ParseAddress check the backend applies before surfacing the value.
+	// The Pattern below is based on the
+	// [WHATWG HTML5 `<input type=email>` validation regex](https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address),
+	// with three deliberate deviations: the backtick is omitted from the local part so the
+	// pattern can be backtick-delimited here; the domain-label group uses + instead of * to
+	// require a dotted domain (e.g. user@host alone is rejected); and the local part is a
+	// dot-atom (dot-separated, no leading/trailing/consecutive dots) so admission matches
+	// the stricter mail.ParseAddress check the backend applies before surfacing the value.
 	// +kubebuilder:validation:MaxLength=256
 	// +kubebuilder:validation:Pattern=`^[a-zA-Z0-9!#$%&'*+/=?^_{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$`
 	// +optional

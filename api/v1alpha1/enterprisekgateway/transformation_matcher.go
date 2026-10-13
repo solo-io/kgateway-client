@@ -5,7 +5,7 @@ package enterprisekgateway
 type TransformationRequestMatcher struct {
 	// Prefix configures the prefix rule meaning that the prefix must
 	// match the beginning of the *:path* header.
-	// Max length is following https://gateway-api.sigs.k8s.io/reference/spec/#httppathmatch
+	// Max length is following https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httppathmatch
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=1024
 	// +optional
@@ -13,7 +13,7 @@ type TransformationRequestMatcher struct {
 
 	// Path configures the exact path rule meaning that the path must
 	// exactly match the *:path* header once the query string is removed.
-	// Max length is following https://gateway-api.sigs.k8s.io/reference/spec/#httppathmatch
+	// Max length is following https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httppathmatch
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=1024
 	// +optional
