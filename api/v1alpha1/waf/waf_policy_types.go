@@ -27,7 +27,7 @@ const (
 // WAFPolicy contains Web Application Firewall configuration that can be applied to one or more routes.
 // This configuration is consumed by an [External Processing Server](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/ext_proc/v3/external_processor.proto)
 // that all WAF-enabled traffic will pass through.
-// If using the bundled WAF extproc server, all configuration provided in the WAFPolicy must be supported by the [Coraza](https://www.coraza.io/) WAF engine.
+// If using the bundled WAF extproc server, all configuration provided in the WAFPolicy must be supported by the [Coraza](https://coraza.io/) WAF engine.
 type WAFPolicy struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
@@ -62,7 +62,7 @@ type WAFPolicyStatus struct {
 type WAFPolicySpec struct {
 	// CoreRuleSet contains settings for the OWASP CoreRuleSet.
 	// If set, then the OWASP CoreRuleSet rules will be loaded.
-	// The bundled WAF extproc server uses the [v4 CoreRuleSet rules](https://github.com/coreruleset/coreruleset/tree/v4.21.0/rules).
+	// The bundled WAF extproc server uses the [v4 CoreRuleSet rules](https://github.com/coreruleset/coreruleset/tree/v4.0/main/rules).
 	// +optional
 	CoreRuleSet *CoreRuleSet `json:"coreRuleSet,omitempty"`
 

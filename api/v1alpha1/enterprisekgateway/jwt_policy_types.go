@@ -150,19 +150,6 @@ type RemoteJWKS struct {
 	//   - Jwks is ready when the requests come, not need to wait for the Jwks fetching.
 	// +optional
 	AsyncFetch *JwksAsyncFetch `json:"asyncFetch,omitempty"`
-
-	// Timeout for a JWKS fetch request. If unspecified, defaults to 5s.
-	// +optional
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:MaxLength=32
-	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9]{1,5}(h|m|s|ms)){1,4}$')",message="invalid duration value"
-	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('1ms')",message="timeout must be at least 1ms."
-	Timeout *metav1.Duration `json:"timeout,omitempty"`
-
-	// RetryPolicy configures retries with exponential backoff when fetching JWKS fails.
-	// Applies to both on-demand and asynchronous fetches.
-	// +optional
-	RetryPolicy *JWKSRetryPolicy `json:"retryPolicy,omitempty"`
 }
 
 // Fetch Jwks asynchronously in the main thread when the filter config is parsed.
@@ -176,48 +163,6 @@ type JwksAsyncFetch struct {
 	// Default is false.
 	// +optional
 	FastListener *bool `json:"fastListener,omitempty"`
-
-	// FailedRefetchDuration is the delay before retrying an asynchronous fetch after
-	// the fetch and its configured retries fail. If unspecified, Envoy defaults to 1s.
-	// +optional
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:MaxLength=32
-	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9]{1,5}(h|m|s|ms)){1,4}$')",message="invalid duration value"
-	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('1ms')",message="failedRefetchDuration must be at least 1ms."
-	FailedRefetchDuration *metav1.Duration `json:"failedRefetchDuration,omitempty"`
-}
-
-// JWKSRetryPolicy configures retries for failed JWKS requests.
-type JWKSRetryPolicy struct {
-	// NumRetries is the number of retries after the initial request. Defaults to 1.
-	// +optional
-	// +kubebuilder:validation:Minimum=1
-	NumRetries *int32 `json:"numRetries,omitempty"`
-
-	// BackOff configures exponential backoff with jitter between request retries.
-	// If unspecified, Envoy uses a 1s base interval and a maximum of 10 times the base.
-	// +optional
-	BackOff *JWKSRetryBackOff `json:"backOff,omitempty"`
-}
-
-// JWKSRetryBackOff configures exponential backoff for JWKS request retries.
-// +kubebuilder:validation:XValidation:rule="!has(self.maxInterval) || duration(self.maxInterval) >= duration(self.baseInterval)",message="maxInterval must be greater than or equal to baseInterval."
-type JWKSRetryBackOff struct {
-	// BaseInterval is the initial backoff interval.
-	// +required
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:MaxLength=32
-	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9]{1,5}(h|m|s|ms)){1,4}$')",message="invalid duration value"
-	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('1ms')",message="baseInterval must be at least 1ms."
-	BaseInterval metav1.Duration `json:"baseInterval"`
-
-	// MaxInterval caps the backoff interval. Defaults to 10 times BaseInterval.
-	// +optional
-	// +kubebuilder:validation:Type=string
-	// +kubebuilder:validation:MaxLength=32
-	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9]{1,5}(h|m|s|ms)){1,4}$')",message="invalid duration value"
-	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('1ms')",message="maxInterval must be at least 1ms."
-	MaxInterval *metav1.Duration `json:"maxInterval,omitempty"`
 }
 
 // Describes the location of a JWT token
@@ -235,7 +180,6 @@ type TokenSource struct {
 type TokenSourceHeaderSource struct {
 	// The name of the header. for example, "authorization"
 	// +required
-	// +kubebuilder:validation:XValidation:rule="self != ''",message="header must not be empty"
 	Header string `json:"header"`
 
 	// Prefix before the token. for example, "Bearer "
