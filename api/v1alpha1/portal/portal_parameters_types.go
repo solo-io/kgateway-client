@@ -65,16 +65,6 @@ type PortalParametersSpec struct {
 	// When omitted, a user is an admin if the JWT's "groups" claim contains "admin".
 	// +optional
 	AdminAuth *AdminAuthConfig `json:"adminAuth,omitempty"`
-
-	// omitDefaultSecurityContext suppresses the default pod- and container-level
-	// securityContext on both Deployments this Portal provisions — the web
-	// server and, when enabled, the auth server. Set it on platforms that assign
-	// a securityContext themselves, such as OpenShift, where the defaults' UID
-	// 10101 falls outside the namespace's allowed SCC range. A podSecurityContext
-	// or container.securityContext set explicitly on a role is still rendered.
-	//
-	// +optional
-	OmitDefaultSecurityContext *bool `json:"omitDefaultSecurityContext,omitempty"`
 }
 
 const (
@@ -108,37 +98,8 @@ type AdminAuthConfig struct {
 	AdminGroups []string `json:"adminGroups,omitempty"`
 }
 
-// GoRuntimeConfiguration tunes the Go runtime for a portal server.
-// GOMAXPROCS is container-aware by default and does not require a corresponding
-// setting here.
-type GoRuntimeConfiguration struct {
-	// GoMemLimitPercent sets GOMEMLIMIT as a percentage of resources.limits.memory.
-	// The effective default is 100. Omission and an explicit 100 have the same behavior:
-	// when a memory limit is configured, GOMEMLIMIT uses resourceFieldRef to read the
-	// full container limit at startup, including admission-time changes. Without a
-	// configured memory limit, no GOMEMLIMIT is generated, even if an overlay or
-	// admission later adds a limit. This avoids using node allocatable memory as the
-	// default Go budget.
-	// Values from 1 to 99 require a configured memory limit and are calculated before
-	// deployment overlays are applied. Overlays can override the generated value.
-	// Environment variables do not follow in-place Pod resizes. A VPA can make a
-	// fixed percentage value stale; at 100, only in-place resizing makes it stale.
-	// A stale value after a memory decrease can increase OOM risk; after an increase,
-	// it can cause unnecessarily frequent garbage collection.
-	// 90 is recommended when additional OOM headroom is needed; a lower value such
-	// as 80 may be appropriate for significant memory use outside the Go runtime.
-	// Zero is not valid; omit this field to use the default behavior.
-	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=100
-	// +optional
-	GoMemLimitPercent *int32 `json:"goMemLimitPercent,omitempty"`
-}
-
 // PortalWebServer configures the portal web server deployment.
 type PortalWebServer struct {
-	GoRuntimeConfiguration `json:",inline"`
-
 	// replicas is the number of portal web server pods.
 	// If omitted, defaults to 1. If using an HPA, do not set this field.
 	// +kubebuilder:validation:Minimum=0
@@ -153,10 +114,6 @@ type PortalWebServer struct {
 	// +optional
 	Container *PortalWebServerContainer `json:"container,omitempty"`
 
-	// pod configures the portal pod.
-	// +optional
-	Pod *PortalPod `json:"pod,omitempty"`
-
 	// LogLevel sets the log level for the portal web server process. One of:
 	// "error", "warn", "info", "debug", "trace". When unset, the binary's
 	// default level (info) is used.
@@ -169,19 +126,6 @@ type PortalWebServer struct {
 	upstream.GatewayParametersOverlays `json:",inline"`
 }
 
-// PortalPod configures a portal pod. It uses the same pod.securityContext path
-// as EKP's extensions but is portal-owned rather than upstream.Pod, whose other
-// fields the portal deployer does not implement — among them a startupProbe
-// that would contend with the chart's migration gate.
-type PortalPod struct {
-	// securityContext is merged over the default pod-level securityContext field
-	// by field, so setting one field keeps the defaults for the rest. Nested
-	// blocks and lists are replaced rather than merged. A deploymentOverlay is
-	// applied after this and still wins.
-	// +optional
-	SecurityContext *corev1.PodSecurityContext `json:"securityContext,omitempty"`
-}
-
 // PortalWebServerContainer configures the portal web server container.
 type PortalWebServerContainer struct {
 	// image overrides the portal web server container image.
@@ -189,13 +133,6 @@ type PortalWebServerContainer struct {
 	// independently; unset fields retain the chart defaults.
 	// +optional
 	Image *upstream.Image `json:"image,omitempty"`
-
-	// securityContext is merged over the default container-level securityContext
-	// field by field, so setting one field keeps the defaults for the rest.
-	// Nested blocks merge, and capabilities lists are additive: a default entry
-	// cannot be removed here, only via omitDefaultSecurityContext.
-	// +optional
-	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 }
 
 // PortalAuthServer configures the portal auth server deployment. The portal auth
@@ -207,8 +144,6 @@ type PortalWebServerContainer struct {
 // admin CRUD traffic — independent scaling, independent fault domain, independent
 // DB connection pool.
 type PortalAuthServer struct {
-	GoRuntimeConfiguration `json:",inline"`
-
 	// replicas is the number of portal auth server pods.
 	// If omitted, defaults to 1. If using an HPA, do not set this field.
 	// +kubebuilder:validation:Minimum=0
@@ -224,10 +159,6 @@ type PortalAuthServer struct {
 	// (for example, pinning the auth server to a specific tag during a rolling upgrade).
 	// +optional
 	Container *PortalWebServerContainer `json:"container,omitempty"`
-
-	// pod configures the portal pod.
-	// +optional
-	Pod *PortalPod `json:"pod,omitempty"`
 
 	// LogLevel sets the log level for the portal auth server process. One of:
 	// "error", "warn", "info", "debug", "trace". When unset, the binary's
