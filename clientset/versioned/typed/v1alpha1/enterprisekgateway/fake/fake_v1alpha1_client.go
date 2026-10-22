@@ -27,10 +27,6 @@ type FakeEnterprisekgatewayEnterprisekgateway struct {
 	*testing.Fake
 }
 
-func (c *FakeEnterprisekgatewayEnterprisekgateway) EnterpriseKgatewayDestinationSelectors(namespace string) enterprisekgateway.EnterpriseKgatewayDestinationSelectorInterface {
-	return newFakeEnterpriseKgatewayDestinationSelectors(c, namespace)
-}
-
 func (c *FakeEnterprisekgatewayEnterprisekgateway) EnterpriseKgatewayParameters(namespace string) enterprisekgateway.EnterpriseKgatewayParametersInterface {
 	return newFakeEnterpriseKgatewayParameters(c, namespace)
 }

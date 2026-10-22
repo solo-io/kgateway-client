@@ -16,9 +16,8 @@ import (
 // and enterprise ExtAuth and RateLimiter extensions
 // +genclient
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:categories={enterprisekgateway,ekgw},path=enterprisekgatewayparameters,shortName=ekgpar
+// +kubebuilder:resource:categories={enterprisekgateway,ekgw},path=enterprisekgatewayparameters
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Accepted",type="string",JSONPath=".status.conditions[?(@.type=='Accepted')].status"
 // +kubebuilder:metadata:labels={app=enterprisekgateway,app.kubernetes.io/name=enterprisekgatewayparameters}
 type EnterpriseKgatewayParameters struct {
 	metav1.TypeMeta `json:",inline"`
@@ -108,28 +107,7 @@ type EnterpriseKgatewayKubernetesProxyConfig struct {
 	SharedExtensions *Extensions `json:"sharedExtensions,omitempty"`
 }
 
-const (
-	// EnterpriseKgatewayParametersConditionAccepted reports whether this control plane
-	// accepted the parameters.
-	EnterpriseKgatewayParametersConditionAccepted = "Accepted"
-
-	// EnterpriseKgatewayParametersReasonAccepted is the Accepted condition's
-	// reason when the parameters are usable by this control plane.
-	EnterpriseKgatewayParametersReasonAccepted = "Accepted"
-)
-
-// EnterpriseKgatewayParametersStatus reports whether this control plane
-// accepted the parameters.
-type EnterpriseKgatewayParametersStatus struct {
-	// conditions represent the current state of the parameters. The only
-	// condition type is "Accepted".
-	// +listType=map
-	// +listMapKey=type
-	// +patchStrategy=merge
-	// +patchMergeKey=type
-	// +optional
-	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
-}
+type EnterpriseKgatewayParametersStatus struct{}
 
 // EnterpriseKgatewayParametersList is a list of EnterpriseKgatewayParameters resources
 // +k8s:openapi-gen=true
@@ -233,38 +211,8 @@ type DeploymentConfiguration struct {
 	// If absent, no VPA is created. If present, a VPA is created with its targetRef
 	// automatically configured to target the extension Deployment.
 	// The metadata and spec fields from this overlay are applied to the generated VPA.
-	// If goMemLimitPercent is configured and this VPA uses the default
-	// RequestsAndLimits policy or in-place Pod resizing, see goMemLimitPercent
-	// for important caveats.
 	// +optional
 	VerticalPodAutoscaler *shared.KubernetesResourceOverlay `json:"verticalPodAutoscaler,omitempty"`
-}
-
-// GoRuntimeConfiguration tunes the Go runtime for Go-based extension servers.
-// GOMAXPROCS is container-aware by default and does not require a corresponding
-// setting here.
-type GoRuntimeConfiguration struct {
-	// GoMemLimitPercent sets GOMEMLIMIT as a percentage of resources.limits.memory.
-	// The effective default is 100 after parameter inheritance is resolved.
-	// Omission and an explicit 100 have the same behavior: when a memory limit is
-	// configured, GOMEMLIMIT uses resourceFieldRef to read the full container limit
-	// at startup, including admission-time changes. Without a configured memory
-	// limit, no GOMEMLIMIT is generated, even if an overlay or admission later adds
-	// a limit. This avoids using node allocatable memory as the default Go budget.
-	// Values from 1 to 99 require a configured memory limit and are calculated before
-	// deployment overlays are applied. Overlays can override the generated value.
-	// Environment variables do not follow in-place Pod resizes. A VPA can make a
-	// fixed percentage value stale; at 100, only in-place resizing makes it stale.
-	// A stale value after a memory decrease can increase OOM risk; after an increase,
-	// it can cause unnecessarily frequent garbage collection.
-	// 90 is recommended when additional OOM headroom is needed; a lower value such
-	// as 80 may be appropriate for significant memory use outside the Go runtime.
-	// Zero is not valid; omit this field to use the default behavior.
-	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=100
-	// +optional
-	GoMemLimitPercent *int32 `json:"goMemLimitPercent,omitempty"`
 }
 
 type ContainerConfiguration struct {
@@ -286,7 +234,6 @@ type ContainerConfiguration struct {
 // RateLimiterConfiguration configures the RateLimit server deployment.
 type RateLimiterConfiguration struct {
 	DeploymentConfiguration `json:",inline"`
-	GoRuntimeConfiguration  `json:",inline"`
 
 	// Redis configures the Redis connection for the RateLimit server.
 	// When specified, the RateLimit server connects to this Redis instance
@@ -307,7 +254,6 @@ type RateLimiterConfiguration struct {
 // ExtAuthConfiguration configures the ExtAuth server deployment.
 type ExtAuthConfiguration struct {
 	DeploymentConfiguration `json:",inline"`
-	GoRuntimeConfiguration  `json:",inline"`
 
 	// SessionRedis configures the server-level default Redis connection for
 	// ExtAuth session storage (OAuth2/OIDC). When specified, individual
@@ -536,7 +482,6 @@ type RedisConnectionConfig struct {
 
 type WAFConfiguration struct {
 	DeploymentConfiguration `json:",inline"`
-	GoRuntimeConfiguration  `json:",inline"`
 
 	// LogLevel is the log level for the WAF extproc server. If not set, defaults to "info".
 	// +kubebuilder:validation:Enum=error;warn;info;debug;trace
