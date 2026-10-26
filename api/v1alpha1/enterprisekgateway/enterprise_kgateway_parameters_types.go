@@ -550,6 +550,16 @@ type WAFConfiguration struct {
 	// Metrics configures the WAF metrics endpoint.
 	// +optional
 	Metrics *WAFMetricsConfiguration `json:"metrics,omitempty"`
+
+	// MaxRecvMessageBytes is the maximum size in bytes of one gRPC message the WAF server
+	// accepts from the gateway. A body over this limit fails with a processing error
+	// rather than a WAF verdict. The gateway's buffer limits and WAF message timeout might
+	// also need adjustment.
+	// Defaults to 16777216 (16 MiB).
+	//
+	// +kubebuilder:validation:Minimum=1
+	// +optional
+	MaxRecvMessageBytes *int64 `json:"maxRecvMessageBytes,omitempty"`
 }
 
 type WAFLogLevel string
