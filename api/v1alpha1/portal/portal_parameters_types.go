@@ -69,6 +69,11 @@ type PortalParametersSpec struct {
 	// +optional
 	AdminAuth *AdminAuthConfig `json:"adminAuth,omitempty"`
 
+	// webhooks configures how the portal web server delivers webhook events to
+	// admin-configured endpoints.
+	// +optional
+	Webhooks *WebhooksConfig `json:"webhooks,omitempty"`
+
 	// omitDefaultSecurityContext suppresses the default pod- and container-level
 	// securityContext on both Deployments this Portal provisions — the web
 	// server and, when enabled, the auth server. Set it on platforms that assign
@@ -324,6 +329,55 @@ type PostgresTLSConfig struct {
 
 	// clientCertSecretRef references a Secret containing a client certificate and key
 	// (keys: "tls.crt", "tls.key") for mutual TLS authentication with postgres.
+	// +optional
+	ClientCertSecretRef *LocalSecretReference `json:"clientCertSecretRef,omitempty"`
+}
+
+// WebhooksConfig configures webhook delivery for a Portal.
+type WebhooksConfig struct {
+	// endpoints is the list of webhook receivers. Every endpoint receives every event.
+	// +required
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:XValidation:rule="self.all(e1, self.exists_one(e2, e1.name == e2.name))",message="endpoint names must be unique"
+	// +kubebuilder:validation:XValidation:rule="self.all(e1, self.exists_one(e2, e1.url == e2.url))",message="endpoint urls must be unique"
+	Endpoints []WebhookEndpoint `json:"endpoints"`
+
+	// tls configures TLS for deliveries to https webhook endpoints.
+	// +optional
+	TLS *WebhookTLSConfig `json:"tls,omitempty"`
+}
+
+// WebhookEndpoint is a single webhook receiver.
+// +kubebuilder:validation:XValidation:rule="isURL(self.url) && url(self.url).getScheme() in ['http', 'https'] && size(url(self.url).getHostname()) > 0",message="url must be an absolute http or https URL with a host"
+type WebhookEndpoint struct {
+	// name identifies the endpoint in delivery logs.
+	// +required
+	// +kubebuilder:validation:MaxLength=63
+	// +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`
+	Name string `json:"name"`
+
+	// url is the absolute http or https URL events are POSTed to.
+	// +required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=2048
+	URL string `json:"url"`
+}
+
+// WebhookTLSConfig configures TLS for deliveries to https webhook endpoints.
+// Receivers are always verified; there is no option to skip verification.
+// +kubebuilder:validation:AtLeastOneOf=caCertSecretRef;clientCertSecretRef
+type WebhookTLSConfig struct {
+	// caCertSecretRef references a Secret containing a CA certificate (key: "ca.crt")
+	// trusted in addition to the system roots when verifying webhook receivers.
+	// Set it when receivers use certificates from a private CA.
+	// +optional
+	CACertSecretRef *LocalSecretReference `json:"caCertSecretRef,omitempty"`
+
+	// clientCertSecretRef references a Secret containing a client certificate and key
+	// (keys: "tls.crt", "tls.key") presented to receivers that require mutual TLS.
 	// +optional
 	ClientCertSecretRef *LocalSecretReference `json:"clientCertSecretRef,omitempty"`
 }
