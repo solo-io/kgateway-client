@@ -58,6 +58,9 @@ type PortalParametersSpec struct {
 	// idpServerURL is the URL of an Identity Provider SPI server for OAuth client management.
 	// When set, OAuth credential create/delete operations are delegated to this external server
 	// (e.g., Keycloak via gloo-portal-idp-connect). When omitted, oauth endpoint will return a 500.
+	// Must be an http or https URL with no whitespace or quotes.
+	// +kubebuilder:validation:Pattern=`^https?://[^\s"']+$`
+	// +kubebuilder:validation:MaxLength=2048
 	// +optional
 	IdpServerURL *string `json:"idpServerURL,omitempty"`
 
