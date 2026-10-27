@@ -160,10 +160,12 @@ type ApiDocSelector struct {
 // OpenAPIMetadata is the metadata for the OpenAPI specification for a given API product version.
 // When configured, at least one field should be set.
 // All fields except contact are surfaced as top-level fields on the API product version
-// response (description as "documentation"). All fields are also merged into the info object
-// of the stitched OpenAPI schema returned in apiSpec: title, description, and termsOfService
-// map to info.title, info.description, and info.termsOfService; contact maps to
-// info.contact.url; and license maps to info.license.name.
+// response (description as "documentation"). The info object of the OpenAPI schema returned
+// in apiSpec is built from these fields and replaces the source ApiDocs' info: title,
+// description, and termsOfService map to info.title, info.description, and
+// info.termsOfService; contact maps to info.contact.email, info.contact.url, or
+// info.contact.name; and license maps to info.license.name. info.title defaults to the
+// ApiProduct's displayName, then its id, and info.version is the version name.
 type OpenAPIMetadata struct {
 	// title is the title of the OpenAPI specification for this API.
 	// +kubebuilder:validation:MinLength=1
