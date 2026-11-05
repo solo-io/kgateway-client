@@ -32,7 +32,7 @@ import (
 )
 
 type Interface interface {
-	Discovery() discovery.DiscoveryInterface
+	Discovery() discovery.DiscoveryInterfaces
 	ExtauthV1() extauthv1.ExtauthV1Interface
 	RatelimitV1alpha1() ratelimitv1alpha1.RatelimitV1alpha1Interface
 	EnterprisekgatewayEnterprisekgateway() enterprisekgatewayenterprisekgateway.EnterprisekgatewayEnterprisekgatewayInterface
@@ -76,7 +76,7 @@ func (c *Clientset) EnterprisekgatewayEnterprisesolo() enterprisekgatewayenterpr
 }
 
 // Discovery retrieves the DiscoveryClient
-func (c *Clientset) Discovery() discovery.DiscoveryInterface {
+func (c *Clientset) Discovery() discovery.DiscoveryInterfaces {
 	if c == nil {
 		return nil
 	}
