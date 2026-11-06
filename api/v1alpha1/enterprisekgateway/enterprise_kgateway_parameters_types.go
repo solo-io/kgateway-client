@@ -487,34 +487,52 @@ type RedisConnectionConfig struct {
 	// DialTimeout is the timeout for establishing new connections.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	DialTimeout *metav1.Duration `json:"dialTimeout,omitempty"`
 
 	// ReadTimeout is the timeout for reading a single command reply.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	ReadTimeout *metav1.Duration `json:"readTimeout,omitempty"`
 
 	// WriteTimeout is the timeout for writing a single command.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	WriteTimeout *metav1.Duration `json:"writeTimeout,omitempty"`
 
 	// PoolTimeout is the time to wait for a connection from the pool
 	// when all connections are busy.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	PoolTimeout *metav1.Duration `json:"poolTimeout,omitempty"`
 
 	// ConnMaxIdleTime is the maximum time a connection may be idle before
 	// being closed.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	ConnMaxIdleTime *metav1.Duration `json:"connMaxIdleTime,omitempty"`
 
 	// ConnMaxLifetime is the maximum lifetime of a connection before it is
 	// closed and recreated, regardless of activity.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	ConnMaxLifetime *metav1.Duration `json:"connMaxLifetime,omitempty"`
 
 	// MaxRetries is the maximum number of retries on failed commands.
@@ -526,11 +544,17 @@ type RedisConnectionConfig struct {
 	// MinRetryBackoff is the minimum backoff interval between retries.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	MinRetryBackoff *metav1.Duration `json:"minRetryBackoff,omitempty"`
 
 	// MaxRetryBackoff is the maximum backoff interval between retries.
 	//
 	// +optional
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:XValidation:rule="duration(self) >= duration('-2562047h')",message="must be a Go duration such as 500ms, 1.5s or 1m30s"
 	MaxRetryBackoff *metav1.Duration `json:"maxRetryBackoff,omitempty"`
 }
 
