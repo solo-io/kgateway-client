@@ -1,4 +1,6 @@
 FROM golang:1.26 AS builder
+# Allow synced go.mod files to select a newer Go toolchain than the base image.
+ENV GOTOOLCHAIN=auto
 WORKDIR /workspace
 
 COPY go.mod go.sum ./
