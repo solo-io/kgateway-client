@@ -19,6 +19,10 @@ Versioning aligns with Solo Enterprise for kgateway releases, for example `v2.x.
 The HEAD of `main` in `kgateway-client` tracks the synced HEAD of `main` from
 Solo Enterprise for kgateway.
 
+The `github.com/kgateway-dev/kgateway/v2` requirement is the public upstream
+kgateway commit that the synced Enterprise source is built on. It is often a Go
+pseudo-version of an untagged upstream commit rather than a kgateway release.
+
 ### Tagging Strategy
 
 Tags in this repository are created by automation and use a leading `v`

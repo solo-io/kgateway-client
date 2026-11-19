@@ -204,34 +204,34 @@ for ref in "${refs[@]}"; do
 	go_mod="${wt}/go.mod"
 	kgw_version_raw="$(awk_module_version "${go_mod}" "github.com/kgateway-dev/kgateway/v2")"
 	gw_api_version="$(awk_module_version "${go_mod}" "sigs.k8s.io/gateway-api")"
-	upstream_chart_version="${kgw_version_raw}"
-
-	if is_go_pseudo_version "${upstream_chart_version}"; then
-		merged_tag="$(git -C "${wt}" tag --merged HEAD --sort=-version:refname | head -n 1)"
-		if [[ -z "${merged_tag}" ]]; then
-			log="${tmp_dir}/${safe_ref}__versions.log"
-			{
-				echo "Failed to resolve a published kgateway chart version for pseudo-version dependency ${kgw_version_raw}."
-				echo "No merged repo tag was available for ref ${ref}."
-			} >"${log}"
-			print_result "${ref}" "resolve-versions" "FAIL" "${log}"
-			record_failure "${ref}" "resolve-versions" "${log}"
-			continue
-		fi
-		upstream_chart_version="${merged_tag}"
-	fi
-
-	if [[ -z "${kgw_version_raw}" || -z "${gw_api_version}" || -z "${upstream_chart_version}" ]]; then
+	if [[ -z "${kgw_version_raw}" || -z "${gw_api_version}" ]]; then
 		log="${tmp_dir}/${safe_ref}__versions.log"
 		{
 			echo "Failed to resolve required module versions from ${go_mod}."
 			echo "github.com/kgateway-dev/kgateway/v2=${kgw_version_raw:-<empty>}"
-			echo "upstream chart version=${upstream_chart_version:-<empty>}"
 			echo "sigs.k8s.io/gateway-api=${gw_api_version:-<empty>}"
 		} >"${log}"
 		print_result "${ref}" "resolve-versions" "FAIL" "${log}"
 		record_failure "${ref}" "resolve-versions" "${log}"
 		continue
+	fi
+
+	upstream_chart=(oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds --version "${kgw_version_raw}")
+	if is_go_pseudo_version "${kgw_version_raw}"; then
+		# The Go module contains the chart for this exact upstream commit.
+		log="${tmp_dir}/${safe_ref}__versions.log"
+		if ! module_dir=$(
+			# A redirect on the assignment would not apply inside the substitution.
+			exec 2>"${log}"
+			export GOWORK=off
+			go -C "${wt}" mod download github.com/kgateway-dev/kgateway/v2 &&
+				go -C "${wt}" list -m -f '{{.Dir}}' github.com/kgateway-dev/kgateway/v2
+		); then
+			print_result "${ref}" "resolve-versions" "FAIL" "${log}"
+			record_failure "${ref}" "resolve-versions" "${log}"
+			continue
+		fi
+		upstream_chart=("${module_dir}/install/helm/kgateway-crds")
 	fi
 
 	cluster_name="kgw-e2e-${safe_ref,,}"
@@ -261,15 +261,14 @@ for ref in "${refs[@]}"; do
 	if (
 		set -euo pipefail
 		echo "Pinned upstream kgateway module version: ${kgw_version_raw}"
-		echo "Using upstream kgateway CRD chart version: ${upstream_chart_version}"
+		echo "Using upstream kgateway CRD chart: ${upstream_chart[*]}"
 		echo "Generating enterprise CRDs from checked-out API types in ${wt}"
 		echo "Using Gateway API version: ${gw_api_version}"
 
 		generate_enterprise_crds "${wt}" "${enterprise_crd_dir}"
 
 		helm upgrade --install kgateway-crds \
-			oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
-			--version "${upstream_chart_version}" \
+			"${upstream_chart[@]}" \
 			--namespace kgateway-system \
 			--create-namespace \
 			--kubeconfig "${kubeconfig_path}"

@@ -46,9 +46,15 @@ GW_API_VERSION=v1.4.1
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/"${GW_API_VERSION}"/standard-install.yaml
 ```
 
-If `UPSTREAM_KGW_VERSION` resolves to a pseudo-version on an unreleased ref such
-as `main`, use the latest compatible published `kgateway-crds` chart version
-instead.
+If `UPSTREAM_KGW_VERSION` is a Go pseudo-version, no published chart has that
+version. Install the chart from the pinned upstream module instead:
+
+```sh
+go mod download github.com/kgateway-dev/kgateway/v2
+UPSTREAM_DIR="$(go list -m -f '{{.Dir}}' github.com/kgateway-dev/kgateway/v2)"
+helm upgrade --install kgateway-crds "${UPSTREAM_DIR}/install/helm/kgateway-crds" \
+  --namespace kgateway-system --create-namespace
+```
 
 Then verify the resources used in this example are available:
 
