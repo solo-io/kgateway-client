@@ -94,7 +94,7 @@ const file_ref_proto_rawDesc = "" +
 	"\tref.proto\x12\fcore.solo.io\"?\n" +
 	"\vResourceRef\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespaceBMZKgithub.com/solo-io/gloo-gateway/v2/external/enterprise.gloo.solo.io/v1/coreb\x06proto3"
+	"\tnamespace\x18\x02 \x01(\tR\tnamespaceBMZKgithub.com/solo-io/kgateway-client/v2/external/enterprise.gloo.solo.io/v1/coreb\x06proto3"
 
 var (
 	file_ref_proto_rawDescOnce sync.Once
